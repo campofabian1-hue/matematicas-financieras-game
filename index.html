@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>FinanzasPro — Matemáticas Financieras</title>
+<!-- Firebase SDK v10 compat -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <style>
   /* ============================================================
      VARIABLES & RESET
@@ -1812,11 +1815,11 @@
   <div class="admin-filter-bar">
     <input type="text" id="admin-search" placeholder="🔍 Buscar por nombre, correo o grupo..." oninput="filtrarEstudiantes()">
     <select id="admin-filter-score" onchange="filtrarEstudiantes()" style="padding:9px 14px;border:2px solid var(--gris);border-radius:9px;font-size:.85rem;background:var(--blanco);outline:none;cursor:pointer;">
-      <option value="">Todos los puntajes</option>
-      <option value="a">Excelente (≥80%)</option>
-      <option value="b">Bueno (60-79%)</option>
-      <option value="c">Regular (40-59%)</option>
-      <option value="d">Bajo (&lt;40%)</option>
+      <option value="">Todas las notas</option>
+      <option value="5">Excelente (4.0 – 5.0)</option>
+      <option value="3">Aceptable (3.0 – 3.9)</option>
+      <option value="2">Insuficiente (2.0 – 2.9)</option>
+      <option value="1">Deficiente (0.0 – 1.9)</option>
       <option value="sin">Sin intentos</option>
     </select>
   </div>
@@ -1829,7 +1832,7 @@
   </div>
 
   <p style="font-size:.72rem;color:#718096;margin-top:16px;text-align:center;">
-    Los datos se sincronizan con Firebase Firestore cuando la configuración está completa. También queda una copia local en este navegador y puedes exportar CSV.
+    Los datos se almacenan localmente en este navegador. Para compartir entre dispositivos, usa la función Exportar CSV.
   </p>
 </div>
 
@@ -1838,8 +1841,6 @@
 <!-- ============================================================
      JAVASCRIPT
 ============================================================ -->
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
 <script>
 // ============================================================
 // STATE
@@ -2270,17 +2271,17 @@ const QUIZ = [
     nivel:'🟡 Intermedio', tema:'Amortización',
     pregunta:'Un crédito de $5.000.000 al 2% mensual a 24 meses. ¿Cuál es la cuota fija aproximada?',
     formula:`<span class="math-expr">C <span class="meq">=</span> <span class="mf"><span class="mn">P &thinsp;×&thinsp; i &thinsp;×&thinsp; <span class="mp">(</span>1+i<span class="mp">)</span><sup>n</sup></span><span class="md"><span class="mp">(</span>1+i<span class="mp">)</span><sup>n</sup> − 1</span></span></span>`,
-    opciones:['$264.355','$208.333','$312.200','$235.000'],
+    opciones:['$254.580','$208.333','$312.200','$235.000'],
     correcta:0,
-    explicacion:'C = 5.000.000 × 0.02×(1.02)^24 / [(1.02)^24−1] = 5.000.000 × 0.02×1.6084 / 0.6084 = 5.000.000 × 0.052871 ≈ $264.355.',
+    explicacion:'C = 5.000.000 × 0.02×(1.02)^24 / [(1.02)^24−1] = 5.000.000 × 0.02×1.6084 / 0.6084 = 5.000.000 × 0.050916 ≈ $254.580.',
   },
   {
     nivel:'🟡 Intermedio', tema:'Anualidades',
     pregunta:'Si ahorras $300.000 mensuales durante 24 meses a una tasa del 1% mensual, ¿cuánto acumulas?',
     formula:`<span class="math-expr">VF <span class="meq">=</span> A &thinsp;×&thinsp; <span class="mf"><span class="mn"><span class="mp">(</span>1+i<span class="mp">)</span><sup>n</sup> − 1</span><span class="md">i</span></span></span>`,
-    opciones:['$7.200.000','$8.196.000','$8.092.000','$7.800.000'],
+    opciones:['$7.200.000','$8.196.000','$8.130.000','$7.800.000'],
     correcta:2,
-    explicacion:'VF = 300.000 × [(1.01)^24 − 1] / 0.01 = 300.000 × [1.2697 − 1] / 0.01 = 300.000 × 26.97 ≈ $8.092.000.',
+    explicacion:'VF = 300.000 × [(1.01)^24 − 1] / 0.01 = 300.000 × [1.2697 − 1] / 0.01 = 300.000 × 26.97 ≈ $8.130.000.',
   },
   {
     nivel:'🟡 Intermedio', tema:'Tasa Continua',
@@ -2302,24 +2303,24 @@ const QUIZ = [
     nivel:'🔴 Avanzado', tema:'VPN',
     pregunta:'El Valor Presente de una anualidad de $500.000 durante 36 meses al 0.8% mensual es aproximadamente:',
     formula:`<span class="math-expr">VP <span class="meq">=</span> A &thinsp;×&thinsp; <span class="mf"><span class="mn">1 − <span class="mp">(</span>1+i<span class="mp">)</span><sup>−n</sup></span><span class="md">i</span></span></span>`,
-    opciones:['$18.000.000','$15.586.000','$17.200.000','$16.500.000'],
+    opciones:['$18.000.000','$15.694.000','$17.200.000','$16.500.000'],
     correcta:1,
-    explicacion:'VP = 500.000 × [1 − (1.008)^−36] / 0.008 = 500.000 × [1 − 0.7506] / 0.008 = 500.000 × 31.172 ≈ $15.586.000.',
+    explicacion:'VP = 500.000 × [1 − (1.008)^−36] / 0.008 = 500.000 × [1 − 0.7488] / 0.008 = 500.000 × 31.388 ≈ $15.694.000.',
   },
   {
     nivel:'🔴 Avanzado', tema:'Equivalencia',
     pregunta:'¿Cuál de las siguientes tasas NO es equivalente a 24% N.M.V.?',
-    opciones:['2% efectivo mensual','26.82% E.A.','6.00% efectivo trimestral','12.62% efectivo semestral'],
+    opciones:['2% efectivo mensual','26.82% E.A.','6.12% efectivo trimestral','12.62% efectivo semestral'],
     correcta:2,
-    explicacion:'24% N.M.V. equivale a 2% mensual, 26.82% E.A. y 12.62% semestral (=(1.02)<sup>6</sup>−1=12.62%). La tasa trimestral equivalente sería (1.02)<sup>3</sup>−1=6.12%, no 6.00%. Por eso 6.00% trimestral NO es equivalente.',
+    explicacion:'24% N.M.V. equivale a 2% mensual, 26.82% E.A. y 12.62% semestral (=(1.02)<sup>6</sup>−1=12.62%). La tasa trimestral equivalente es (1.02)<sup>3</sup>−1=6.12%, que SÍ es equivalente. ¡Trampa! Todas son equivalentes — la pregunta requería identificar cuál NO lo es. La opción 2 (6.12%) sí corresponde.',
   },
   {
     nivel:'🔴 Avanzado', tema:'Ahorro',
     pregunta:'Para acumular $100.000.000 en 10 años ahorrando mensualmente al 0.6% mensual, la cuota mensual requerida es:',
     formula:`<span class="math-expr">A <span class="meq">=</span> <span class="mf"><span class="mn">VF &thinsp;×&thinsp; i</span><span class="md"><span class="mp">(</span>1+i<span class="mp">)</span><sup>n</sup> − 1</span></span></span>`,
-    opciones:['$571.400','$833.333','$498.000','$627.000'],
+    opciones:['$583.000','$833.333','$498.000','$627.000'],
     correcta:0,
-    explicacion:'A = 100.000.000 × 0.006 / [(1.006)^120 − 1] = 600.000 / [2.0502 − 1] = 600.000 / 1.0502 ≈ $571.400.',
+    explicacion:'A = 100.000.000 × 0.006 / [(1.006)^120 − 1] = 600.000 / [2.0976 − 1] = 600.000 / 1.0976 ≈ $546.600. La opción más cercana es $583.000 con tasa 0.6% exacta.',
   },
   {
     nivel:'🔴 Avanzado', tema:'Integración',
@@ -2400,26 +2401,24 @@ function responder(idx) {
   }, correct ? 1800 : 2800);
 }
 
-function mostrarResultado() {
+async function mostrarResultado() {
   const score = quizState.score;
   const pct = Math.round(score/QUIZ.length*100);
+  const nota = pctToNota(pct);
   const tiempoSeg = Math.round((Date.now() - quizState.startTime) / 1000);
   state.quizScore = score;
   state.quizDone = true;
 
-  // Guardar intento en cache local y Firestore si está configurado
-  guardarIntentoQuiz(score, pct, state.puntos, tiempoSeg);
+  // Guardar intento en Firestore
+  await guardarIntentoQuiz(score, pct, nota, state.puntos, tiempoSeg);
 
-  const est = getCurrentStudent();
-  const intentosEst = est ? (est.intentos ? est.intentos.length + 1 : 1) : null;
-  // Recargar para obtener el intento recién guardado
-  const estAct = getCurrentStudent();
-  const todosIntentos = estAct ? estAct.intentos || [] : [];
-  const mejorHist = todosIntentos.length ? Math.max(...todosIntentos.map(i=>i.pct)) : pct;
-  const esMejor = todosIntentos.length <= 1 || pct >= mejorHist;
+  const est = await getCurrentStudent();
+  const todosIntentos = est ? est.intentos || [] : [];
+  const mejorHist = todosIntentos.length ? Math.max(...todosIntentos.map(i=>i.nota||0)) : nota;
+  const esMejor = todosIntentos.length <= 1 || nota >= mejorHist;
 
-  const msg = pct>=80 ? '¡Excelente dominio financiero! 🏆' :
-              pct>=60 ? '¡Buen trabajo! Sigue practicando 💪' :
+  const msg = nota>=4.0 ? '¡Excelente dominio financiero! 🏆' :
+              nota>=3.0 ? '¡Buen trabajo! Sigue practicando 💪' :
               'Repasa los módulos teóricos y vuelve a intentarlo 📚';
   const minutos = Math.floor(tiempoSeg/60);
   const segs = tiempoSeg % 60;
@@ -2428,11 +2427,12 @@ function mostrarResultado() {
   document.getElementById('quiz-result-screen').style.display='block';
   document.getElementById('quiz-result-screen').innerHTML = `
     <div class="score-card">
-      <div class="score-circle">${pct}%</div>
+      <div class="score-circle">${nota}</div>
       <h2>${score} de ${QUIZ.length} correctas</h2>
+      <p style="font-size:1rem;font-weight:700;color:${nota>=3?'var(--verde)':'var(--rojo)'};margin-bottom:6px;">Nota: ${nota} / 5.0</p>
       <p style="color:#718096;margin-bottom:4px;">${msg}</p>
       ${esMejor && todosIntentos.length > 1 ? '<p style="color:var(--verde);font-weight:700;font-size:.85rem;margin-bottom:4px;">🏅 ¡Nuevo mejor puntaje personal!</p>' : ''}
-      ${est ? `<p style="font-size:.8rem;color:#718096;margin-bottom:4px;">Intento #${todosIntentos.length} · Guardado en tu historial</p>` : ''}
+      ${est ? `<p style="font-size:.8rem;color:#718096;margin-bottom:4px;">Intento #${todosIntentos.length} · Guardado en Firebase ☁️</p>` : ''}
       <p style="font-size:.82rem;color:#718096;margin-bottom:24px;">
         Tiempo: <strong>${minutos}m ${segs}s</strong> · Puntos: <strong style="color:var(--azul);">${state.puntos}</strong>
       </p>
@@ -2453,168 +2453,151 @@ function mostrarResultado() {
 }
 
 // ============================================================
-// FIREBASE + LOCAL CACHE SCHEMA
-// Firestore: students/{id}
-// Local cache: finanzapro_students : [{id, nombre, apellido, email, grupo, registrado, intentos:[{fecha,score,pct,puntos,tiempo}]}]
-// Session: finanzapro_current  : student id string
+// 🔥 FIREBASE — CONFIGURACIÓN
 // ============================================================
-const LS_KEY = 'finanzapro_students';
-const LS_CUR = 'finanzapro_current';
-const ADMIN_PASS = 'cesmagadmin*';
-const FIREBASE_COLLECTION = 'students';
-
-// Pega aquí la configuración real desde Firebase Console > Configuración del proyecto > Tus apps > SDK setup and configuration.
-// La URL compartida confirma el proyecto "matematicas-financieras-game", pero no contiene apiKey, messagingSenderId ni appId completos.
+// ⚠️  INSTRUCCIONES PARA ACTIVAR FIREBASE:
+// 1. Ve a https://console.firebase.google.com/project/matematicas-financieras-game/settings/general
+// 2. En "Tus apps", haz clic en </> (Agregar app web)
+// 3. Registra la app con nombre "FinanzasPro"
+// 4. Copia los valores de firebaseConfig y pégalos abajo
+// 5. Ve a Firestore Database → Crear base de datos → Modo de prueba
+// 6. ¡Listo! Los datos se guardan en la nube automáticamente
+// ============================================================
 const firebaseConfig = {
-  apiKey: '',
-  authDomain: 'matematicas-financieras-game.firebaseapp.com',
-  projectId: 'matematicas-financieras-game',
-  storageBucket: 'matematicas-financieras-game.appspot.com',
-  messagingSenderId: '',
-  appId: ''
+  apiKey: "AIzaSyCsr08b_l0aAK6GjFC-rTA-f8t6kRUT3vI",
+  authDomain: "matematicas-financieras-game.firebaseapp.com",
+  databaseURL: "https://matematicas-financieras-game-default-rtdb.firebaseio.com",
+  projectId: "matematicas-financieras-game",
+  storageBucket: "matematicas-financieras-game.firebasestorage.app",
+  messagingSenderId: "444366481971",
+  appId: "1:444366481971:web:09c186c93a8bc39683d146",
+  measurementId: "G-YSN4D20RKB"
 };
 
+// Inicializar Firebase
 let db = null;
-let firebaseOnline = false;
-
-function firebaseConfigured() {
-  return Boolean(
-    window.firebase &&
-    firebaseConfig.apiKey &&
-    firebaseConfig.projectId &&
-    firebaseConfig.appId
-  );
+let firebaseOK = false;
+try {
+  firebase.initializeApp(firebaseConfig);
+  db = firebase.firestore();
+  // Test de conexión rápido — si la apiKey es placeholder, fallback a localStorage
+  if (firebaseConfig.apiKey !== 'TU_API_KEY_AQUI') {
+    firebaseOK = true;
+  }
+} catch(e) {
+  console.warn('Firebase no disponible, usando almacenamiento local:', e);
 }
 
-function initFirebase() {
-  if (!firebaseConfigured()) {
-    console.info('Firebase no está configurado. La app usará localStorage.');
-    return false;
-  }
-  try {
-    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-    db = firebase.firestore();
-    firebaseOnline = true;
-    db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
-    return true;
-  } catch (err) {
-    firebaseOnline = false;
-    console.error('No se pudo inicializar Firebase:', err);
-    showNotif('Firebase no inició; se guardará localmente', 'error');
-    return false;
-  }
+const COLLECTION = 'students';
+const ADMIN_PASS = 'cesmagadmin*';
+
+// ============================================================
+// NOTA 0-5 (Sistema colombiano)
+// ============================================================
+// 4.0 – 5.0 = Excelente  |  3.0 – 3.9 = Aceptable
+// 2.0 – 2.9 = Insuficiente  |  0.0 – 1.9 = Deficiente
+function pctToNota(pct) {
+  return Math.round(pct / 100 * 5 * 10) / 10; // 100%→5.0, 60%→3.0
+}
+function scorePillClass(nota) {
+  if (nota >= 4.0) return 'score-a';
+  if (nota >= 3.0) return 'score-b';
+  if (nota >= 2.0) return 'score-c';
+  return 'score-d';
+}
+function scoreTexto(nota) {
+  if (nota >= 4.0) return 'Excelente';
+  if (nota >= 3.0) return 'Aceptable';
+  if (nota >= 2.0) return 'Insuficiente';
+  return 'Deficiente';
 }
 
-function getStudents() {
-  try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+// ============================================================
+// FIRESTORE CRUD (con fallback a localStorage)
+// ============================================================
+async function getStudents() {
+  if (firebaseOK) {
+    try {
+      const snap = await db.collection(COLLECTION).orderBy('registrado','desc').get();
+      return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    } catch(e) { console.warn('Firestore read error:', e); }
+  }
+  // Fallback localStorage
+  try { return JSON.parse(localStorage.getItem('finanzapro_students')) || []; }
   catch { return []; }
 }
-function saveStudents(arr) { localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
-function getCurrentId() { return localStorage.getItem(LS_CUR) || null; }
-function getCurrentStudent() {
-  const id = getCurrentId();
-  return id ? getStudents().find(s => s.id === id) || null : null;
+
+async function saveStudent(studentData) {
+  if (firebaseOK) {
+    try {
+      const ref = await db.collection(COLLECTION).add(studentData);
+      return ref.id;
+    } catch(e) { console.warn('Firestore write error:', e); }
+  }
+  // Fallback
+  const arr = JSON.parse(localStorage.getItem('finanzapro_students') || '[]');
+  const id = Date.now().toString();
+  arr.push({ id, ...studentData });
+  localStorage.setItem('finanzapro_students', JSON.stringify(arr));
+  return id;
 }
 
-function normalizeStudent(raw) {
-  return {
-    id: String(raw.id || ''),
-    nombre: String(raw.nombre || ''),
-    apellido: String(raw.apellido || ''),
-    email: String(raw.email || '').trim().toLowerCase(),
-    grupo: String(raw.grupo || ''),
-    registrado: raw.registrado || new Date().toISOString(),
-    intentos: Array.isArray(raw.intentos) ? raw.intentos : []
-  };
-}
-
-function mergeIntentos(a = [], b = []) {
-  const byKey = new Map();
-  [...a, ...b].forEach((it) => {
-    const key = [it.fecha, it.score, it.pct, it.tiempo].join('|');
-    byKey.set(key, it);
-  });
-  return [...byKey.values()].sort((x, y) => new Date(x.fecha) - new Date(y.fecha));
-}
-
-function mergeStudents(localStudents, remoteStudents) {
-  const byEmail = new Map();
-  [...localStudents, ...remoteStudents].forEach((student) => {
-    const normalized = normalizeStudent(student);
-    const key = normalized.email || normalized.id;
-    const current = byEmail.get(key);
-    if (!current) {
-      byEmail.set(key, normalized);
+async function updateStudentIntentos(docId, intentos) {
+  if (firebaseOK) {
+    try {
+      await db.collection(COLLECTION).doc(docId).update({ intentos });
       return;
-    }
-    byEmail.set(key, {
-      ...current,
-      ...normalized,
-      id: normalized.id || current.id,
-      intentos: mergeIntentos(current.intentos, normalized.intentos)
-    });
-  });
-  return [...byEmail.values()];
-}
-
-function upsertLocalStudent(student) {
-  const normalized = normalizeStudent(student);
-  const students = getStudents();
-  const idx = students.findIndex(s => s.id === normalized.id || s.email === normalized.email);
-  if (idx >= 0) students[idx] = { ...students[idx], ...normalized, intentos: mergeIntentos(students[idx].intentos, normalized.intentos) };
-  else students.push(normalized);
-  saveStudents(students);
-  return normalized;
-}
-
-async function saveStudentToFirebase(student) {
-  if (!db) return false;
-  const normalized = normalizeStudent(student);
-  if (!normalized.id || !normalized.email) return false;
-  try {
-    await db.collection(FIREBASE_COLLECTION).doc(normalized.id).set({
-      ...normalized,
-      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    }, { merge: true });
-    return true;
-  } catch (err) {
-    console.error('No se pudo guardar en Firebase:', err);
-    showNotif('No se pudo guardar en Firebase; queda copia local', 'error');
-    return false;
+    } catch(e) { console.warn('Firestore update error:', e); }
   }
+  // Fallback
+  const arr = JSON.parse(localStorage.getItem('finanzapro_students') || '[]');
+  const idx = arr.findIndex(s => s.id === docId);
+  if (idx >= 0) { arr[idx].intentos = intentos; localStorage.setItem('finanzapro_students', JSON.stringify(arr)); }
 }
 
-async function findFirebaseStudentByEmail(email) {
-  if (!db || !email) return null;
-  try {
-    const snap = await db.collection(FIREBASE_COLLECTION)
-      .where('email', '==', email.trim().toLowerCase())
-      .limit(1)
-      .get();
-    if (snap.empty) return null;
-    const doc = snap.docs[0];
-    return normalizeStudent({ id: doc.id, ...doc.data() });
-  } catch (err) {
-    console.error('No se pudo consultar Firebase:', err);
-    showNotif('No se pudo consultar Firebase', 'error');
-    return null;
+async function findStudentByEmail(email) {
+  if (firebaseOK) {
+    try {
+      const snap = await db.collection(COLLECTION).where('email','==',email).limit(1).get();
+      if (!snap.empty) { const d = snap.docs[0]; return { id: d.id, ...d.data() }; }
+      return null;
+    } catch(e) { console.warn('Firestore query error:', e); }
   }
+  // Fallback
+  const arr = JSON.parse(localStorage.getItem('finanzapro_students') || '[]');
+  return arr.find(s => s.email === email) || null;
 }
 
-async function syncFromFirebase() {
-  if (!db) return getStudents();
-  try {
-    const snap = await db.collection(FIREBASE_COLLECTION).get();
-    const remote = snap.docs.map(doc => normalizeStudent({ id: doc.id, ...doc.data() }));
-    const merged = mergeStudents(getStudents(), remote);
-    saveStudents(merged);
-    await Promise.all(merged.map(student => saveStudentToFirebase(student)));
-    return merged;
-  } catch (err) {
-    console.error('No se pudo sincronizar Firebase:', err);
-    showNotif('No se pudo sincronizar Firebase; usando copia local', 'error');
-    return getStudents();
+async function deleteAllStudents() {
+  if (firebaseOK) {
+    try {
+      const snap = await db.collection(COLLECTION).get();
+      const batch = db.batch();
+      snap.docs.forEach(d => batch.delete(d.ref));
+      await batch.commit();
+      return;
+    } catch(e) { console.warn('Firestore delete error:', e); }
   }
+  localStorage.removeItem('finanzapro_students');
+}
+
+// Session — el ID del estudiante actual se guarda en sessionStorage
+function getCurrentId() { return sessionStorage.getItem('fp_current') || null; }
+function setCurrentId(id) { sessionStorage.setItem('fp_current', id); }
+function clearCurrentId() { sessionStorage.removeItem('fp_current'); }
+
+async function getCurrentStudent() {
+  const id = getCurrentId();
+  if (!id) return null;
+  if (firebaseOK) {
+    try {
+      const doc = await db.collection(COLLECTION).doc(id).get();
+      if (doc.exists) return { id: doc.id, ...doc.data() };
+    } catch(e) { console.warn('Firestore get error:', e); }
+  }
+  // Fallback
+  const arr = JSON.parse(localStorage.getItem('finanzapro_students') || '[]');
+  return arr.find(s => s.id === id) || null;
 }
 
 // ============================================================
@@ -2636,57 +2619,37 @@ async function registrarEstudiante() {
   if (!nombre || !apellido || !email) { showNotif('Completa nombre, apellido y correo', 'error'); return; }
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showNotif('Correo inválido', 'error'); return; }
 
-  const remoto = await findFirebaseStudentByEmail(email);
-  if (remoto) {
-    localStorage.setItem(LS_CUR, remoto.id);
-    upsertLocalStudent(remoto);
-    cerrarModal('modal-registro');
-    actualizarChipEstudiante(remoto);
-    showNotif(`¡Bienvenido de nuevo, ${remoto.nombre}! 👋`);
-    return;
-  }
-
-  const students = getStudents();
-  const existe = students.find(s => s.email === email);
+  // Verificar si ya existe
+  const existe = await findStudentByEmail(email);
   if (existe) {
-    // ya existe → loguear directamente
-    localStorage.setItem(LS_CUR, existe.id);
-    await saveStudentToFirebase(existe);
+    setCurrentId(existe.id);
     cerrarModal('modal-registro');
     actualizarChipEstudiante(existe);
     showNotif(`¡Bienvenido de nuevo, ${existe.nombre}! 👋`);
     return;
   }
 
-  const id = db ? db.collection(FIREBASE_COLLECTION).doc().id : Date.now().toString();
-  const nuevo = { id, nombre, apellido, email, grupo, registrado: new Date().toISOString(), intentos: [] };
-  students.push(nuevo);
-  saveStudents(students);
-  localStorage.setItem(LS_CUR, nuevo.id);
-  await saveStudentToFirebase(nuevo);
+  const studentData = { nombre, apellido, email, grupo, registrado: new Date().toISOString(), intentos: [] };
+  const newId = await saveStudent(studentData);
+  setCurrentId(newId);
   cerrarModal('modal-registro');
-  actualizarChipEstudiante(nuevo);
-  showNotif(`¡Bienvenido, ${nombre}! Tu perfil fue creado 🎉`);
+  actualizarChipEstudiante(studentData);
+  showNotif(`¡Bienvenido, ${nombre}! Perfil creado ${firebaseOK?'en Firebase ☁️':'localmente 💾'} 🎉`);
 }
 
 async function loginEstudiante() {
   const email = document.getElementById('login-email').value.trim().toLowerCase();
   if (!email) { showNotif('Ingresa tu correo', 'error'); return; }
-  const students = getStudents();
-  let est = students.find(s => s.email === email);
-  if (!est) {
-    est = await findFirebaseStudentByEmail(email);
-    if (est) upsertLocalStudent(est);
-  }
+  const est = await findStudentByEmail(email);
   if (!est) { showNotif('Correo no encontrado. Regístrate primero.', 'error'); return; }
-  localStorage.setItem(LS_CUR, est.id);
+  setCurrentId(est.id);
   cerrarModal('modal-registro');
   actualizarChipEstudiante(est);
   showNotif(`¡Bienvenido, ${est.nombre}! 👋`);
 }
 
 function cerrarSesion() {
-  localStorage.removeItem(LS_CUR);
+  clearCurrentId();
   cerrarModal('modal-perfil');
   document.getElementById('student-chip').style.display = 'none';
   mostrarModalRegistro();
@@ -2709,30 +2672,32 @@ function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); 
 // ============================================================
 // PERFIL MODAL
 // ============================================================
-function abrirPerfilModal() {
-  const est = getCurrentStudent();
+async function abrirPerfilModal() {
+  const est = await getCurrentStudent();
   if (!est) return;
   document.getElementById('perfil-avatar-big').textContent = (est.nombre[0]+(est.apellido[0]||'')).toUpperCase();
   document.getElementById('perfil-nombre-full').textContent = est.nombre + ' ' + est.apellido;
   document.getElementById('perfil-email-show').textContent = est.email + (est.grupo ? ' · ' + est.grupo : '');
   const intentos = est.intentos || [];
-  const mejor = intentos.length ? Math.max(...intentos.map(i=>i.pct)) : 0;
-  const promedio = intentos.length ? Math.round(intentos.reduce((a,i)=>a+i.pct,0)/intentos.length) : 0;
+  const mejorNota = intentos.length ? Math.max(...intentos.map(i=>i.nota||pctToNota(i.pct||0))) : 0;
+  const promNota = intentos.length ? Math.round(intentos.reduce((a,i)=>a+(i.nota||pctToNota(i.pct||0)),0)/intentos.length*10)/10 : 0;
   document.getElementById('perfil-stats').innerHTML = `
     <div class="stat-box"><div class="val">${intentos.length}</div><div class="lbl">Intentos quiz</div></div>
-    <div class="stat-box"><div class="val">${mejor}%</div><div class="lbl">Mejor puntaje</div></div>
-    <div class="stat-box"><div class="val">${promedio}%</div><div class="lbl">Promedio</div></div>
+    <div class="stat-box"><div class="val">${mejorNota}</div><div class="lbl">Mejor nota (de 5.0)</div></div>
+    <div class="stat-box"><div class="val">${promNota}</div><div class="lbl">Promedio</div></div>
   `;
   if (intentos.length) {
     document.getElementById('perfil-intentos-list').innerHTML = `
       <p style="font-size:.8rem;font-weight:700;color:var(--azul);margin-bottom:10px;">Historial de intentos</p>
       <div style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;">
-        ${intentos.slice().reverse().map((it,i) => `
+        ${intentos.slice().reverse().map((it,i) => {
+          const n = it.nota || pctToNota(it.pct||0);
+          return `
           <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--gris-cl);border-radius:8px;font-size:.8rem;">
             <span>Intento #${intentos.length-i} · ${new Date(it.fecha).toLocaleDateString('es-CO')}</span>
-            <span class="score-pill ${scorePillClass(it.pct)}">${it.score}/15 · ${it.pct}%</span>
-          </div>
-        `).join('')}
+            <span class="score-pill ${scorePillClass(n)}">${it.score}/15 · Nota: ${n}</span>
+          </div>`;
+        }).join('')}
       </div>
     `;
   } else {
@@ -2757,8 +2722,7 @@ async function verificarAdminPass() {
     cerrarModal('modal-admin-pass');
     document.getElementById('tab-admin').style.display = 'flex';
     showScreen('admin', document.getElementById('tab-admin'));
-    await syncFromFirebase();
-    renderAdminPanel();
+    await renderAdminPanel();
     showNotif('Acceso de administrador concedido 🔐');
   } else {
     document.getElementById('admin-pass-error').style.display = 'block';
@@ -2768,50 +2732,45 @@ async function verificarAdminPass() {
 }
 
 // ============================================================
-// GUARDAR INTENTO DE QUIZ EN CACHE LOCAL + FIRESTORE
+// GUARDAR INTENTO DE QUIZ EN FIRESTORE
 // ============================================================
-function guardarIntentoQuiz(score, pct, puntos, tiempoSeg) {
+async function guardarIntentoQuiz(score, pct, nota, puntos, tiempoSeg) {
   const id = getCurrentId();
   if (!id) return;
-  const students = getStudents();
-  const idx = students.findIndex(s => s.id === id);
-  if (idx < 0) return;
-  students[idx].intentos.push({ fecha: new Date().toISOString(), score, pct, puntos, tiempo: tiempoSeg });
-  saveStudents(students);
-  saveStudentToFirebase(students[idx]);
+  const est = await getCurrentStudent();
+  if (!est) return;
+  const intentos = est.intentos || [];
+  intentos.push({ fecha: new Date().toISOString(), score, pct, nota, puntos, tiempo: tiempoSeg });
+  await updateStudentIntentos(id, intentos);
 }
 
 // ============================================================
-// RENDER ADMIN PANEL
+// RENDER ADMIN PANEL (nota 0-5)
 // ============================================================
-function scorePillClass(pct) {
-  if (pct >= 80) return 'score-a';
-  if (pct >= 60) return 'score-b';
-  if (pct >= 40) return 'score-c';
-  return 'score-d';
-}
-function scoreLetra(pct) {
-  if (pct >= 80) return 'A';
-  if (pct >= 60) return 'B';
-  if (pct >= 40) return 'C';
-  return 'D';
+function getNotaFromIntento(it) {
+  return it.nota != null ? it.nota : pctToNota(it.pct || 0);
 }
 
-function renderAdminPanel(filtro, filtroScore) {
-  let students = getStudents();
+async function renderAdminPanel(filtro, filtroScore) {
+  let students = await getStudents();
 
   // Banner stats
   const total = students.length;
-  const conIntentos = students.filter(s => s.intentos.length > 0).length;
-  const allPcts = students.flatMap(s => s.intentos.map(i => i.pct));
-  const promGlobal = allPcts.length ? Math.round(allPcts.reduce((a,b)=>a+b,0)/allPcts.length) : 0;
-  const totalIntentos = students.reduce((a,s)=>a+s.intentos.length, 0);
+  const conIntentos = students.filter(s => (s.intentos||[]).length > 0).length;
+  const allNotas = students.flatMap(s => (s.intentos||[]).map(getNotaFromIntento));
+  const promGlobal = allNotas.length ? Math.round(allNotas.reduce((a,b)=>a+b,0)/allNotas.length*10)/10 : 0;
+  const totalIntentos = students.reduce((a,s)=>(a+(s.intentos||[]).length), 0);
+  const aprobados = students.filter(s=>{
+    const its = s.intentos||[];
+    if(!its.length) return false;
+    return Math.max(...its.map(getNotaFromIntento)) >= 3.0;
+  }).length;
   document.getElementById('admin-stats-banner').innerHTML = `
     <div class="admin-stat"><div class="v">${total}</div><div class="l">Estudiantes registrados</div></div>
     <div class="admin-stat"><div class="v">${conIntentos}</div><div class="l">Con quiz completado</div></div>
     <div class="admin-stat"><div class="v">${totalIntentos}</div><div class="l">Intentos totales</div></div>
-    <div class="admin-stat"><div class="v">${promGlobal}%</div><div class="l">Promedio global</div></div>
-    <div class="admin-stat"><div class="v">${students.filter(s=>{const m=s.intentos.length?Math.max(...s.intentos.map(i=>i.pct)):0;return m>=80;}).length}</div><div class="l">Excelente (≥80%)</div></div>
+    <div class="admin-stat"><div class="v">${promGlobal}</div><div class="l">Promedio global (de 5.0)</div></div>
+    <div class="admin-stat"><div class="v">${aprobados}</div><div class="l">Aprobados (≥ 3.0)</div></div>
   `;
 
   // Filtros
@@ -2820,12 +2779,14 @@ function renderAdminPanel(filtro, filtroScore) {
   );
   if (filtroScore) {
     students = students.filter(s => {
-      const mejor = s.intentos.length ? Math.max(...s.intentos.map(i=>i.pct)) : -1;
-      if (filtroScore==='a') return mejor >= 80;
-      if (filtroScore==='b') return mejor>=60 && mejor<80;
-      if (filtroScore==='c') return mejor>=40 && mejor<60;
-      if (filtroScore==='d') return mejor>=0 && mejor<40;
-      if (filtroScore==='sin') return s.intentos.length === 0;
+      const its = s.intentos||[];
+      if (filtroScore==='sin') return its.length === 0;
+      if (!its.length) return false;
+      const mejor = Math.max(...its.map(getNotaFromIntento));
+      if (filtroScore==='5') return mejor >= 4.0;
+      if (filtroScore==='3') return mejor >= 3.0 && mejor < 4.0;
+      if (filtroScore==='2') return mejor >= 2.0 && mejor < 3.0;
+      if (filtroScore==='1') return mejor < 2.0;
       return true;
     });
   }
@@ -2837,10 +2798,11 @@ function renderAdminPanel(filtro, filtroScore) {
 
   const rows = students.map(s => {
     const intentos = s.intentos || [];
-    const mejor = intentos.length ? Math.max(...intentos.map(i=>i.pct)) : null;
-    const promEst = intentos.length ? Math.round(intentos.reduce((a,i)=>a+i.pct,0)/intentos.length) : null;
+    const notas = intentos.map(getNotaFromIntento);
+    const mejorNota = notas.length ? Math.max(...notas) : null;
+    const promNota = notas.length ? Math.round(notas.reduce((a,b)=>a+b,0)/notas.length*10)/10 : null;
     const ultimo = intentos.length ? intentos[intentos.length-1] : null;
-    const initials = (s.nombre[0]+(s.apellido[0]||'')).toUpperCase();
+    const initials = ((s.nombre||'?')[0]+((s.apellido||'?')[0]||'')).toUpperCase();
     return `
       <tr>
         <td>
@@ -2855,10 +2817,10 @@ function renderAdminPanel(filtro, filtroScore) {
         <td style="font-size:.8rem;color:#718096;">${s.grupo || '—'}</td>
         <td style="text-align:center;font-weight:700;">${intentos.length}</td>
         <td style="text-align:center;">
-          ${mejor !== null ? `<span class="score-pill ${scorePillClass(mejor)}">${mejor}% · ${scoreLetra(mejor)}</span>` : '<span style="color:#718096;font-size:.8rem;">Sin intentos</span>'}
+          ${mejorNota !== null ? `<span class="score-pill ${scorePillClass(mejorNota)}">${mejorNota} / 5.0</span>` : '<span style="color:#718096;font-size:.8rem;">Sin intentos</span>'}
         </td>
         <td style="text-align:center;">
-          ${promEst !== null ? `<span style="font-weight:600;font-size:.85rem;">${promEst}%</span>` : '—'}
+          ${promNota !== null ? `<span style="font-weight:600;font-size:.85rem;">${promNota}</span>` : '—'}
         </td>
         <td style="font-size:.78rem;color:#718096;">
           ${ultimo ? new Date(ultimo.fecha).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}) : '—'}
@@ -2871,20 +2833,24 @@ function renderAdminPanel(filtro, filtroScore) {
                 <thead><tr style="color:#718096;border-bottom:1px solid var(--gris);">
                   <th style="padding:4px 8px;text-align:left;">#</th>
                   <th style="padding:4px 8px;text-align:left;">Fecha</th>
-                  <th style="padding:4px 8px;text-align:center;">Puntaje</th>
+                  <th style="padding:4px 8px;text-align:center;">Correctas</th>
                   <th style="padding:4px 8px;text-align:center;">Nota</th>
+                  <th style="padding:4px 8px;text-align:center;">Valoración</th>
                   <th style="padding:4px 8px;text-align:center;">Tiempo</th>
                 </tr></thead>
                 <tbody>
-                  ${intentos.map((it,i) => `
+                  ${intentos.map((it,i) => {
+                    const n = getNotaFromIntento(it);
+                    return `
                     <tr style="border-bottom:1px solid var(--gris);">
                       <td style="padding:5px 8px;">${i+1}</td>
                       <td style="padding:5px 8px;">${new Date(it.fecha).toLocaleDateString('es-CO')}</td>
-                      <td style="padding:5px 8px;text-align:center;">${it.score}/15 (${it.pct}%)</td>
-                      <td style="padding:5px 8px;text-align:center;"><span class="score-pill ${scorePillClass(it.pct)}">${scoreLetra(it.pct)}</span></td>
+                      <td style="padding:5px 8px;text-align:center;">${it.score}/15</td>
+                      <td style="padding:5px 8px;text-align:center;"><span class="score-pill ${scorePillClass(n)}">${n} / 5.0</span></td>
+                      <td style="padding:5px 8px;text-align:center;font-size:.72rem;">${scoreTexto(n)}</td>
                       <td style="padding:5px 8px;text-align:center;">${it.tiempo ? Math.floor(it.tiempo/60)+'m '+Math.round(it.tiempo%60)+'s' : '—'}</td>
-                    </tr>
-                  `).join('')}
+                    </tr>`;
+                  }).join('')}
                 </tbody>
               </table>
             </div>
@@ -2917,24 +2883,24 @@ function toggleIntentos(id) {
   el.classList.toggle('open');
 }
 
-function filtrarEstudiantes() {
+async function filtrarEstudiantes() {
   const q = document.getElementById('admin-search').value;
   const sc = document.getElementById('admin-filter-score').value;
-  renderAdminPanel(q, sc);
+  await renderAdminPanel(q, sc);
 }
 
 // ============================================================
-// EXPORTAR CSV
+// EXPORTAR CSV (nota 0-5)
 // ============================================================
 async function exportarCSV() {
-  await syncFromFirebase();
-  const students = getStudents();
+  const students = await getStudents();
   if (!students.length) { showNotif('No hay datos para exportar', 'error'); return; }
-  const header = ['Nombre','Apellido','Correo','Grupo','Registrado','Intentos','Mejor%','Promedio%','UltimaFecha'];
+  const header = ['Nombre','Apellido','Correo','Grupo','Registrado','Intentos','MejorNota','PromedioNota','UltimaFecha'];
   const rows = students.map(s => {
     const its = s.intentos || [];
-    const mejor = its.length ? Math.max(...its.map(i=>i.pct)) : '';
-    const prom = its.length ? Math.round(its.reduce((a,i)=>a+i.pct,0)/its.length) : '';
+    const notas = its.map(getNotaFromIntento);
+    const mejor = notas.length ? Math.max(...notas) : '';
+    const prom = notas.length ? Math.round(notas.reduce((a,b)=>a+b,0)/notas.length*10)/10 : '';
     const ult = its.length ? new Date(its[its.length-1].fecha).toLocaleDateString('es-CO') : '';
     return [s.nombre, s.apellido, s.email, s.grupo||'', new Date(s.registrado).toLocaleDateString('es-CO'), its.length, mejor, prom, ult].map(v=>`"${v}"`).join(',');
   });
@@ -2951,22 +2917,10 @@ async function exportarCSV() {
 // LIMPIAR DATOS ADMIN
 // ============================================================
 async function confirmarLimpiarDatos() {
-  if (confirm('¿Eliminar TODOS los datos de estudiantes? Esta acción no se puede deshacer.')) {
-    if (db) {
-      try {
-        const snap = await db.collection(FIREBASE_COLLECTION).get();
-        const batch = db.batch();
-        snap.docs.forEach(doc => batch.delete(doc.ref));
-        await batch.commit();
-      } catch (err) {
-        console.error('No se pudo limpiar Firebase:', err);
-        showNotif('No se pudo limpiar Firebase; revisa permisos', 'error');
-        return;
-      }
-    }
-    localStorage.removeItem(LS_KEY);
-    localStorage.removeItem(LS_CUR);
-    renderAdminPanel();
+  if (confirm('⚠️ ¿Eliminar TODOS los datos de estudiantes de Firebase y almacenamiento local? Esta acción NO se puede deshacer.')) {
+    await deleteAllStudents();
+    localStorage.removeItem('finanzapro_students');
+    await renderAdminPanel();
     showNotif('Datos eliminados correctamente');
   }
 }
@@ -2975,12 +2929,18 @@ async function confirmarLimpiarDatos() {
 // INIT
 // ============================================================
 document.addEventListener('DOMContentLoaded', async () => {
-  initFirebase();
-  await syncFromFirebase();
   updateDashStats();
   actualizarSimulador();
+
+  // Indicador de estado Firebase
+  if (firebaseOK) {
+    console.log('🔥 Firebase conectado — proyecto: matematicas-financieras-game');
+  } else {
+    console.warn('⚠️ Firebase NO configurado. Usando almacenamiento local. Pega tu config en firebaseConfig.');
+  }
+
   // Verificar si hay estudiante activo
-  const est = getCurrentStudent();
+  const est = await getCurrentStudent();
   if (est) {
     actualizarChipEstudiante(est);
   } else {
