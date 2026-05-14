@@ -2348,11 +2348,20 @@ function renderQuestion() {
   const q = QUIZ[quizState.current];
   const idx = quizState.current;
   const pct = (idx / QUIZ.length) * 100;
+  const notaParcial = (Math.round(quizState.score / QUIZ.length * 5 * 10) / 10).toFixed(1);
+  const notaColor = quizState.score/Math.max(idx,1)*5 >= 3 ? 'var(--verde)' : (quizState.score/Math.max(idx,1)*5 >= 2 ? 'var(--dorado)' : 'var(--rojo)');
   const html = `
     <div class="quiz-header">
       <span style="font-size:.8rem;font-weight:700;color:var(--azul);">${q.nivel} · ${q.tema}</span>
       <div class="quiz-progress-wrap"><div class="quiz-progress" style="width:${pct}%"></div></div>
       <span style="font-size:.8rem;font-weight:700;color:#718096;">${idx+1}/${QUIZ.length}</span>
+    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:0 4px;margin-bottom:6px;">
+      <span style="font-size:.78rem;color:#718096;">✅ ${quizState.score}/${idx} correctas</span>
+      <span style="font-size:.85rem;font-weight:800;color:${notaColor};background:${notaColor}15;padding:3px 10px;border-radius:20px;">
+        Nota: ${notaParcial} / 5.0
+      </span>
+      <span style="font-size:.78rem;color:#718096;">🔥 Racha: ${quizState.streak}</span>
     </div>
     <div class="quiz-card">
       <div class="q-num">Pregunta ${idx+1} de ${QUIZ.length}</div>
