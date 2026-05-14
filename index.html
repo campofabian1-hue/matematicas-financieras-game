@@ -1,0 +1,2992 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FinanzasPro — Matemáticas Financieras</title>
+<style>
+  /* ============================================================
+     VARIABLES & RESET
+  ============================================================ */
+  :root {
+    --azul:       #1B3A6B;
+    --azul-medio: #2A5298;
+    --azul-claro: #4A90D9;
+    --dorado:     #F5A623;
+    --dorado-os:  #D4891A;
+    --verde:      #27AE60;
+    --verde-cl:   #2ECC71;
+    --rojo:       #E74C3C;
+    --fondo:      #EEF2F7;
+    --blanco:     #FFFFFF;
+    --gris-cl:    #F8FAFC;
+    --gris:       #CBD5E0;
+    --texto:      #2C3E50;
+    --sombra:     0 4px 20px rgba(27,58,107,.12);
+    --radio:      14px;
+    --trans:      .3s ease;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:'Segoe UI',system-ui,sans-serif;
+    background:var(--fondo);
+    color:var(--texto);
+    min-height:100vh;
+  }
+  /* ============================================================
+     HEADER
+  ============================================================ */
+  header{
+    background:linear-gradient(135deg,var(--azul) 0%,var(--azul-medio) 60%,var(--azul-claro) 100%);
+    color:#fff;
+    padding:0 24px;
+    position:sticky;top:0;z-index:100;
+    box-shadow:0 2px 16px rgba(0,0,0,.25);
+  }
+  .header-inner{
+    max-width:1100px;margin:0 auto;
+    display:flex;align-items:center;justify-content:space-between;
+    height:66px;gap:16px;
+  }
+  .logo{display:flex;align-items:center;gap:12px;}
+  .logo-icon{
+    width:42px;height:42px;
+    background:var(--dorado);
+    border-radius:10px;
+    display:grid;place-items:center;
+    font-size:22px;flex-shrink:0;
+    box-shadow:0 2px 8px rgba(0,0,0,.2);
+  }
+  .logo-text h1{font-size:1.15rem;font-weight:700;letter-spacing:.3px;}
+  .logo-text p{font-size:.7rem;opacity:.8;letter-spacing:.5px;text-transform:uppercase;}
+  .hud{display:flex;align-items:center;gap:18px;}
+  .hud-stat{
+    display:flex;align-items:center;gap:6px;
+    background:rgba(255,255,255,.12);
+    padding:6px 12px;border-radius:20px;
+    font-size:.8rem;font-weight:600;
+  }
+  .hud-stat .ico{font-size:1rem;}
+  .badge-xp{
+    background:var(--dorado);color:var(--azul);
+    padding:6px 14px;border-radius:20px;
+    font-size:.8rem;font-weight:700;
+  }
+  /* ============================================================
+     NAV TABS
+  ============================================================ */
+  .nav-bar{
+    background:var(--blanco);
+    border-bottom:2px solid var(--gris);
+    position:sticky;top:66px;z-index:90;
+  }
+  .nav-inner{
+    max-width:1100px;margin:0 auto;
+    display:flex;gap:0;overflow-x:auto;
+    scrollbar-width:none;
+  }
+  .nav-inner::-webkit-scrollbar{display:none;}
+  .tab-btn{
+    padding:14px 22px;
+    border:none;background:transparent;
+    font-size:.88rem;font-weight:600;
+    color:#718096;cursor:pointer;
+    white-space:nowrap;
+    border-bottom:3px solid transparent;
+    transition:var(--trans);
+    display:flex;align-items:center;gap:8px;
+  }
+  .tab-btn:hover{color:var(--azul-medio);background:var(--gris-cl);}
+  .tab-btn.active{
+    color:var(--azul);
+    border-bottom-color:var(--dorado);
+  }
+  .tab-badge{
+    background:var(--verde-cl);color:#fff;
+    font-size:.65rem;padding:2px 6px;border-radius:10px;
+  }
+  /* ============================================================
+     MAIN LAYOUT
+  ============================================================ */
+  main{max-width:1100px;margin:0 auto;padding:28px 20px 60px;}
+  .screen{display:none;}
+  .screen.active{display:block;animation:fadeUp .35s ease;}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+  /* ============================================================
+     HERO CARD (Dashboard)
+  ============================================================ */
+  .hero{
+    background:linear-gradient(135deg,var(--azul) 0%,var(--azul-claro) 100%);
+    border-radius:20px;padding:36px 40px;color:#fff;
+    margin-bottom:28px;
+    position:relative;overflow:hidden;
+  }
+  .hero::before{
+    content:'∑';font-size:220px;font-weight:900;
+    position:absolute;right:-20px;top:-40px;
+    opacity:.06;line-height:1;
+  }
+  .hero h2{font-size:1.8rem;font-weight:800;margin-bottom:8px;}
+  .hero p{opacity:.85;max-width:540px;line-height:1.6;font-size:.95rem;}
+  .hero-actions{margin-top:24px;display:flex;gap:12px;flex-wrap:wrap;}
+  .btn{
+    padding:11px 22px;border-radius:10px;
+    border:none;cursor:pointer;
+    font-size:.88rem;font-weight:700;
+    transition:var(--trans);
+    display:inline-flex;align-items:center;gap:8px;
+  }
+  .btn-primary{background:var(--dorado);color:var(--azul);}
+  .btn-primary:hover{background:var(--dorado-os);transform:translateY(-1px);}
+  .btn-outline{background:rgba(255,255,255,.15);color:#fff;border:2px solid rgba(255,255,255,.4);}
+  .btn-outline:hover{background:rgba(255,255,255,.25);}
+  .btn-verde{background:var(--verde);color:#fff;}
+  .btn-verde:hover{background:#219a52;transform:translateY(-1px);}
+  .btn-sm{padding:8px 16px;font-size:.8rem;}
+  /* ============================================================
+     CARDS GRID
+  ============================================================ */
+  .cards-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(300px,1fr));
+    gap:20px;margin-bottom:28px;
+  }
+  .card{
+    background:var(--blanco);
+    border-radius:var(--radio);
+    padding:24px;
+    box-shadow:var(--sombra);
+    border:1px solid var(--gris);
+    transition:var(--trans);
+    cursor:pointer;
+  }
+  .card:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(27,58,107,.16);}
+  .card-icon{
+    width:52px;height:52px;border-radius:12px;
+    display:grid;place-items:center;font-size:24px;
+    margin-bottom:16px;
+  }
+  .icon-azul{background:rgba(27,58,107,.1);}
+  .icon-dorado{background:rgba(245,166,35,.15);}
+  .icon-verde{background:rgba(39,174,96,.12);}
+  .icon-rojo{background:rgba(231,76,60,.1);}
+  .card h3{font-size:1rem;font-weight:700;margin-bottom:6px;}
+  .card p{font-size:.82rem;color:#718096;line-height:1.5;}
+  .card-footer{
+    margin-top:16px;padding-top:14px;
+    border-top:1px solid var(--gris);
+    display:flex;align-items:center;justify-content:space-between;
+  }
+  .progress-bar-wrap{
+    background:var(--gris);border-radius:99px;
+    height:6px;flex:1;margin-right:10px;overflow:hidden;
+  }
+  .progress-bar{
+    height:100%;border-radius:99px;
+    background:linear-gradient(90deg,var(--azul-claro),var(--verde-cl));
+    transition:width .5s ease;
+  }
+  .prog-label{font-size:.72rem;color:#718096;white-space:nowrap;}
+  /* ============================================================
+     SECTION HEADER
+  ============================================================ */
+  .sec-header{
+    display:flex;align-items:center;gap:14px;
+    margin-bottom:24px;
+  }
+  .sec-icon{
+    width:48px;height:48px;border-radius:12px;
+    display:grid;place-items:center;font-size:22px;
+    background:linear-gradient(135deg,var(--azul),var(--azul-claro));
+    color:#fff;flex-shrink:0;
+  }
+  .sec-header h2{font-size:1.3rem;font-weight:800;}
+  .sec-header p{font-size:.83rem;color:#718096;}
+  /* ============================================================
+     THEORY PANELS
+  ============================================================ */
+  .theory-tabs{
+    display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px;
+  }
+  .theory-tab{
+    padding:8px 16px;border-radius:8px;
+    border:2px solid var(--gris);background:var(--blanco);
+    font-size:.8rem;font-weight:600;cursor:pointer;
+    transition:var(--trans);color:#718096;
+  }
+  .theory-tab.active{
+    border-color:var(--azul-medio);
+    background:var(--azul-medio);color:#fff;
+  }
+  .theory-panel{display:none;}
+  .theory-panel.active{display:block;animation:fadeUp .3s ease;}
+  /* ============================================================
+     FÓRMULAS ESTILO WORD
+  ============================================================ */
+  .formula-box{
+    background:#faf9f6;
+    border:1px solid #e2ddd5;
+    border-left:5px solid var(--azul);
+    border-radius:0 12px 12px 0;
+    padding:16px 20px;
+    margin:12px 0;
+    display:flex;align-items:center;gap:16px;
+  }
+  .formula-box .formula-ico{font-size:22px;flex-shrink:0;}
+  .fbox-label{
+    font-size:.68rem;color:#718096;
+    text-transform:uppercase;letter-spacing:.7px;
+    font-weight:700;margin-bottom:8px;
+  }
+  .fbox-desc{font-size:.77rem;color:#718096;margin-top:7px;font-style:italic;}
+  /* expresión matemática contenedora */
+  .math-expr{
+    display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap;
+    font-size:1.15rem;
+    font-family:'Cambria','Times New Roman',Georgia,serif;
+    color:var(--azul);line-height:1;
+  }
+  /* fracción apilada */
+  .mf{
+    display:inline-flex;flex-direction:column;align-items:center;
+    margin:0 4px;vertical-align:middle;
+  }
+  .mn{
+    padding:0 5px 3px;
+    border-bottom:1.5px solid var(--azul);
+    line-height:1.3;text-align:center;min-width:16px;
+  }
+  .md{padding:3px 5px 0;line-height:1.3;text-align:center;min-width:16px;}
+  /* fracción pequeña para exponentes */
+  .msf{
+    display:inline-flex;flex-direction:column;align-items:center;
+    font-size:.62em;line-height:1.2;margin:0 1px;vertical-align:middle;
+  }
+  .msn{border-bottom:1px solid currentColor;padding:0 2px;}
+  .msd{padding:0 2px;}
+  /* paréntesis grandes */
+  .mp{font-size:1.4em;line-height:.9;font-weight:300;}
+  /* símbolo igual y operadores con espacio */
+  .meq{margin:0 4px;}
+  /* bloque de dos fórmulas en columna */
+  .math-stack{display:flex;flex-direction:column;gap:8px;}
+  .tip-box{
+    background:rgba(245,166,35,.1);
+    border-left:4px solid var(--dorado);
+    border-radius:0 10px 10px 0;
+    padding:14px 18px;margin:14px 0;
+    font-size:.85rem;line-height:1.6;
+  }
+  .tip-box strong{color:var(--dorado-os);}
+  .step-list{list-style:none;display:flex;flex-direction:column;gap:12px;margin:16px 0;}
+  .step-list li{
+    display:flex;gap:14px;align-items:flex-start;
+    background:var(--blanco);border-radius:10px;
+    padding:14px 18px;border:1px solid var(--gris);
+  }
+  .step-num{
+    width:28px;height:28px;border-radius:50%;
+    background:var(--azul);color:#fff;
+    display:grid;place-items:center;
+    font-size:.8rem;font-weight:700;flex-shrink:0;
+  }
+  /* ============================================================
+     CALCULATORS
+  ============================================================ */
+  .calc-grid{
+    display:grid;grid-template-columns:1fr 1fr;gap:24px;
+  }
+  @media(max-width:700px){.calc-grid{grid-template-columns:1fr;}}
+  .calc-card{
+    background:var(--blanco);border-radius:var(--radio);
+    padding:24px;box-shadow:var(--sombra);
+    border:1px solid var(--gris);
+  }
+  .calc-card h3{
+    font-size:.95rem;font-weight:700;
+    margin-bottom:18px;color:var(--azul);
+    display:flex;align-items:center;gap:8px;
+  }
+  .form-group{margin-bottom:14px;}
+  .form-group label{
+    display:block;font-size:.78rem;
+    font-weight:600;margin-bottom:5px;color:#4A5568;
+  }
+  .form-group input,
+  .form-group select{
+    width:100%;padding:10px 14px;
+    border:2px solid var(--gris);border-radius:9px;
+    font-size:.88rem;background:var(--gris-cl);
+    transition:var(--trans);outline:none;
+    color:var(--texto);
+  }
+  .form-group input:focus,
+  .form-group select:focus{
+    border-color:var(--azul-claro);
+    background:var(--blanco);
+    box-shadow:0 0 0 3px rgba(74,144,217,.15);
+  }
+  .result-box{
+    background:var(--gris-cl);border-radius:10px;
+    padding:18px;margin-top:16px;
+    border:2px solid var(--gris);
+  }
+  .result-box.show{
+    border-color:var(--verde);
+    background:rgba(39,174,96,.06);
+    animation:pulse .4s ease;
+  }
+  @keyframes pulse{0%{transform:scale(.99);}50%{transform:scale(1.005);}100%{transform:scale(1);}}
+  .result-value{
+    font-size:1.6rem;font-weight:800;
+    color:var(--azul);margin-bottom:4px;
+  }
+  .result-label{font-size:.75rem;color:#718096;}
+  .steps-detail{margin-top:14px;}
+  .step-detail-item{
+    font-size:.8rem;padding:8px 0;
+    border-bottom:1px dashed var(--gris);
+    display:flex;justify-content:space-between;
+    align-items:center;
+  }
+  .step-detail-item:last-child{border-bottom:none;}
+  .step-detail-item span{color:var(--azul-medio);font-weight:600;}
+  /* ============================================================
+     AMORTIZATION TABLE
+  ============================================================ */
+  .table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--gris);}
+  table{
+    width:100%;border-collapse:collapse;
+    font-size:.82rem;min-width:600px;
+  }
+  thead tr{background:var(--azul);color:#fff;}
+  thead th{
+    padding:12px 14px;text-align:right;
+    font-weight:600;font-size:.78rem;
+    letter-spacing:.3px;
+  }
+  thead th:first-child{text-align:center;}
+  tbody tr{border-bottom:1px solid var(--gris);transition:var(--trans);}
+  tbody tr:hover{background:rgba(27,58,107,.04);}
+  tbody tr:nth-child(even){background:rgba(238,242,247,.6);}
+  tbody tr:nth-child(even):hover{background:rgba(27,58,107,.06);}
+  tbody td{
+    padding:10px 14px;text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  tbody td:first-child{text-align:center;font-weight:600;color:var(--azul);}
+  tfoot tr{background:var(--azul-medio);color:#fff;}
+  tfoot td{padding:10px 14px;text-align:right;font-weight:700;}
+  tfoot td:first-child{text-align:center;}
+  .highlight-row{background:rgba(39,174,96,.1)!important;font-weight:600;}
+  /* ============================================================
+     QUIZ / JUEGO
+  ============================================================ */
+  .quiz-wrap{max-width:680px;margin:0 auto;}
+  .quiz-header{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-bottom:24px;
+  }
+  .quiz-progress-wrap{
+    flex:1;background:var(--gris);border-radius:99px;
+    height:8px;margin:0 20px;overflow:hidden;
+  }
+  .quiz-progress{
+    height:100%;background:linear-gradient(90deg,var(--dorado),var(--verde-cl));
+    border-radius:99px;transition:width .5s ease;
+  }
+  .quiz-card{
+    background:var(--blanco);border-radius:20px;
+    padding:36px;box-shadow:var(--sombra);
+    border:2px solid var(--gris);
+    text-align:center;
+  }
+  .quiz-card .q-num{
+    font-size:.75rem;font-weight:700;
+    color:var(--azul-claro);text-transform:uppercase;
+    letter-spacing:1px;margin-bottom:12px;
+  }
+  .quiz-card .q-text{
+    font-size:1.1rem;font-weight:600;
+    line-height:1.6;margin-bottom:28px;
+    color:var(--texto);
+  }
+  .q-formula{
+    background:rgba(27,58,107,.07);
+    border:1px solid rgba(27,58,107,.15);
+    border-left:4px solid var(--azul);
+    border-radius:0 10px 10px 0;
+    padding:14px 20px;
+    font-family:'Cambria','Times New Roman',Georgia,serif;
+    font-size:1.05rem;font-weight:500;
+    color:var(--azul);margin-bottom:24px;
+    display:flex;align-items:center;justify-content:center;
+    gap:6px;flex-wrap:wrap;
+  }
+  .q-formula .mf{border-color:var(--azul);}
+  .q-formula .mn{border-bottom-color:var(--azul);}
+  .q-formula .msn{border-bottom-color:var(--azul);}
+  .q-options{
+    display:grid;grid-template-columns:1fr 1fr;
+    gap:12px;margin-bottom:20px;
+  }
+  .q-opt{
+    padding:14px 18px;border-radius:12px;
+    border:2px solid var(--gris);background:var(--gris-cl);
+    cursor:pointer;font-size:.88rem;font-weight:600;
+    transition:var(--trans);
+    font-variant-numeric:tabular-nums;
+  }
+  .q-opt:hover:not(.disabled){
+    border-color:var(--azul-claro);
+    background:rgba(74,144,217,.1);
+    transform:translateY(-1px);
+  }
+  .q-opt.correct{
+    border-color:var(--verde);
+    background:rgba(39,174,96,.15);
+    color:var(--verde);
+  }
+  .q-opt.wrong{
+    border-color:var(--rojo);
+    background:rgba(231,76,60,.1);
+    color:var(--rojo);
+  }
+  .q-opt.disabled{cursor:default;}
+  .q-explanation{
+    background:rgba(245,166,35,.12);
+    border:2px solid rgba(245,166,35,.3);
+    border-radius:12px;padding:16px;
+    font-size:.85rem;line-height:1.6;
+    margin-top:16px;text-align:left;
+    display:none;
+  }
+  .q-explanation.show{display:block;animation:fadeUp .3s ease;}
+  .score-card{
+    text-align:center;padding:48px 32px;
+    background:var(--blanco);border-radius:20px;
+    box-shadow:var(--sombra);
+  }
+  .score-circle{
+    width:120px;height:120px;border-radius:50%;
+    background:linear-gradient(135deg,var(--azul),var(--azul-claro));
+    display:grid;place-items:center;
+    margin:0 auto 24px;
+    font-size:2.2rem;font-weight:800;color:#fff;
+    box-shadow:0 8px 30px rgba(27,58,107,.3);
+  }
+  .score-card h2{font-size:1.5rem;margin-bottom:8px;}
+  .score-card p{color:#718096;margin-bottom:28px;}
+  /* ============================================================
+     AHORRO / ANUALIDADES
+  ============================================================ */
+  .saving-visual{
+    background:linear-gradient(135deg,#f8fafc,#eef2f7);
+    border:2px solid var(--gris);
+    border-radius:14px;padding:24px;
+    margin-top:20px;
+  }
+  .saving-timeline{
+    display:flex;align-items:flex-end;gap:8px;
+    height:120px;margin:16px 0;
+  }
+  .saving-bar{
+    flex:1;border-radius:6px 6px 0 0;
+    background:linear-gradient(180deg,var(--azul-claro),var(--azul));
+    min-height:10px;transition:height .6s cubic-bezier(.34,1.56,.64,1);
+    position:relative;cursor:pointer;
+  }
+  .saving-bar:hover::after{
+    content:attr(data-label);
+    position:absolute;top:-28px;left:50%;transform:translateX(-50%);
+    background:var(--azul);color:#fff;
+    padding:2px 8px;border-radius:6px;
+    font-size:.68rem;font-weight:600;white-space:nowrap;
+  }
+  .saving-bar.highlight{
+    background:linear-gradient(180deg,var(--dorado),var(--dorado-os));
+  }
+  .saving-labels{
+    display:flex;gap:8px;
+    font-size:.65rem;color:#718096;
+    text-align:center;
+  }
+  .saving-labels span{flex:1;}
+  /* ============================================================
+     NOTIFICATIONS
+  ============================================================ */
+  .notif{
+    position:fixed;top:90px;right:20px;z-index:999;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .notif-item{
+    background:var(--blanco);border-radius:12px;
+    padding:14px 18px;box-shadow:0 4px 20px rgba(0,0,0,.15);
+    display:flex;align-items:center;gap:10px;
+    font-size:.85rem;font-weight:600;
+    animation:slideIn .35s ease;
+    border-left:4px solid var(--verde);
+    min-width:260px;
+  }
+  .notif-item.error{border-left-color:var(--rojo);}
+  @keyframes slideIn{from{opacity:0;transform:translateX(30px);}to{opacity:1;transform:translateX(0);}}
+  @keyframes slideOut{from{opacity:1;transform:translateX(0);}to{opacity:0;transform:translateX(30px);}}
+  /* ============================================================
+     MISC
+  ============================================================ */
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+  @media(max-width:600px){.two-col{grid-template-columns:1fr;}}
+  .stat-row{
+    display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));
+    gap:16px;margin-bottom:24px;
+  }
+  .stat-box{
+    background:var(--blanco);border-radius:var(--radio);
+    padding:20px;box-shadow:var(--sombra);
+    text-align:center;border:1px solid var(--gris);
+  }
+  .stat-box .val{
+    font-size:1.7rem;font-weight:800;
+    color:var(--azul);
+  }
+  .stat-box .lbl{font-size:.73rem;color:#718096;margin-top:4px;}
+  .divider{height:1px;background:var(--gris);margin:20px 0;}
+  .tag{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:4px 10px;border-radius:99px;
+    font-size:.72rem;font-weight:600;
+  }
+  .tag-azul{background:rgba(27,58,107,.1);color:var(--azul);}
+  .tag-dorado{background:rgba(245,166,35,.15);color:var(--dorado-os);}
+  .tag-verde{background:rgba(39,174,96,.12);color:var(--verde);}
+  hr.wave{
+    border:none;height:4px;
+    background:linear-gradient(90deg,var(--azul),var(--dorado),var(--verde-cl),var(--azul));
+    border-radius:99px;margin:24px 0;
+  }
+  .empty-state{
+    text-align:center;padding:48px 24px;
+    color:#718096;font-size:.9rem;
+  }
+  .empty-state .ico{font-size:3rem;margin-bottom:12px;}
+  /* scrollbar */
+  ::-webkit-scrollbar{width:6px;height:6px;}
+  ::-webkit-scrollbar-track{background:var(--gris-cl);}
+  ::-webkit-scrollbar-thumb{background:var(--gris);border-radius:3px;}
+
+  /* ============================================================
+     MODAL OVERLAY
+  ============================================================ */
+  .modal-overlay{
+    position:fixed;inset:0;z-index:500;
+    background:rgba(17,25,40,.65);
+    backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;
+    padding:20px;
+    animation:fadeIn .25s ease;
+  }
+  .modal-overlay.hidden{display:none;}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  .modal-box{
+    background:var(--blanco);
+    border-radius:20px;
+    padding:40px 36px;
+    max-width:480px;width:100%;
+    box-shadow:0 24px 60px rgba(0,0,0,.25);
+    animation:slideUp .35s cubic-bezier(.34,1.56,.64,1);
+    position:relative;
+  }
+  @keyframes slideUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+  .modal-logo{
+    width:64px;height:64px;border-radius:16px;
+    background:linear-gradient(135deg,var(--azul),var(--azul-claro));
+    display:grid;place-items:center;font-size:28px;
+    margin:0 auto 20px;
+    box-shadow:0 8px 24px rgba(27,58,107,.3);
+  }
+  .modal-box h2{text-align:center;font-size:1.3rem;margin-bottom:6px;}
+  .modal-box .sub{text-align:center;color:#718096;font-size:.85rem;margin-bottom:28px;line-height:1.5;}
+  .modal-close{
+    position:absolute;top:14px;right:14px;
+    background:none;border:none;cursor:pointer;
+    font-size:1.2rem;color:#718096;padding:4px;
+    border-radius:6px;transition:var(--trans);
+  }
+  .modal-close:hover{background:var(--gris);color:var(--texto);}
+  .modal-box .form-group label{color:var(--texto);}
+  .modal-divider{
+    text-align:center;font-size:.75rem;color:#718096;
+    margin:16px 0;position:relative;
+  }
+  .modal-divider::before,.modal-divider::after{
+    content:'';position:absolute;top:50%;
+    width:42%;height:1px;background:var(--gris);
+  }
+  .modal-divider::before{left:0;}
+  .modal-divider::after{right:0;}
+
+  /* ============================================================
+     STUDENT CHIP (header)
+  ============================================================ */
+  .student-chip{
+    display:flex;align-items:center;gap:8px;
+    background:rgba(255,255,255,.15);
+    border:1px solid rgba(255,255,255,.25);
+    padding:6px 12px 6px 8px;border-radius:20px;
+    font-size:.8rem;cursor:pointer;transition:var(--trans);
+    max-width:200px;
+  }
+  .student-chip:hover{background:rgba(255,255,255,.25);}
+  .student-avatar{
+    width:26px;height:26px;border-radius:50%;
+    background:var(--dorado);color:var(--azul);
+    display:grid;place-items:center;
+    font-size:.7rem;font-weight:800;flex-shrink:0;
+  }
+  .student-name{
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+    font-weight:600;
+  }
+  .btn-admin-header{
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.2);
+    color:#fff;padding:6px 12px;border-radius:8px;
+    font-size:.72rem;font-weight:700;cursor:pointer;
+    transition:var(--trans);letter-spacing:.3px;
+    text-transform:uppercase;
+  }
+  .btn-admin-header:hover{background:rgba(245,166,35,.3);border-color:var(--dorado);}
+
+  /* ============================================================
+     ADMIN DASHBOARD
+  ============================================================ */
+  .admin-table-wrap{overflow-x:auto;border-radius:12px;border:1px solid var(--gris);margin-top:8px;}
+  .admin-table{width:100%;border-collapse:collapse;font-size:.82rem;min-width:700px;}
+  .admin-table thead tr{background:linear-gradient(90deg,var(--azul),var(--azul-medio));color:#fff;}
+  .admin-table thead th{padding:12px 14px;text-align:left;font-weight:600;font-size:.78rem;}
+  .admin-table tbody tr{border-bottom:1px solid var(--gris);transition:var(--trans);}
+  .admin-table tbody tr:hover{background:rgba(27,58,107,.04);}
+  .admin-table tbody td{padding:10px 14px;vertical-align:middle;}
+  .admin-table tfoot td{padding:10px 14px;background:var(--gris-cl);font-weight:700;font-size:.8rem;}
+  .score-pill{
+    display:inline-flex;align-items:center;gap:4px;
+    padding:3px 10px;border-radius:99px;
+    font-size:.75rem;font-weight:700;
+  }
+  .score-a{background:rgba(39,174,96,.15);color:var(--verde);}
+  .score-b{background:rgba(74,144,217,.15);color:var(--azul-claro);}
+  .score-c{background:rgba(245,166,35,.15);color:var(--dorado-os);}
+  .score-d{background:rgba(231,76,60,.12);color:var(--rojo);}
+  .attempt-row{font-size:.75rem;color:#718096;}
+  .expand-btn{
+    background:none;border:none;cursor:pointer;
+    color:var(--azul-claro);font-size:.78rem;font-weight:600;
+    padding:2px 6px;border-radius:4px;transition:var(--trans);
+  }
+  .expand-btn:hover{background:rgba(74,144,217,.1);}
+  .attempts-detail{
+    display:none;background:var(--gris-cl);
+    border-radius:8px;padding:10px 14px;margin-top:6px;
+  }
+  .attempts-detail.open{display:block;}
+  .admin-filter-bar{
+    display:flex;gap:12px;flex-wrap:wrap;
+    align-items:center;margin-bottom:20px;
+  }
+  .admin-filter-bar input{
+    padding:9px 14px;border:2px solid var(--gris);border-radius:9px;
+    font-size:.85rem;background:var(--blanco);
+    outline:none;transition:var(--trans);flex:1;min-width:200px;
+  }
+  .admin-filter-bar input:focus{border-color:var(--azul-claro);}
+  .admin-stat-banner{
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
+    gap:14px;margin-bottom:24px;
+  }
+  .admin-stat{
+    background:var(--blanco);border-radius:12px;
+    padding:18px;text-align:center;
+    box-shadow:var(--sombra);border:1px solid var(--gris);
+  }
+  .admin-stat .v{font-size:1.6rem;font-weight:800;color:var(--azul);}
+  .admin-stat .l{font-size:.72rem;color:#718096;margin-top:2px;}
+  .btn-danger{background:#fef2f2;color:var(--rojo);border:1px solid #fecaca;
+    padding:6px 12px;border-radius:8px;font-size:.75rem;font-weight:600;cursor:pointer;transition:var(--trans);}
+  .btn-danger:hover{background:var(--rojo);color:#fff;}
+  .export-btn{
+    background:var(--verde);color:#fff;
+    padding:9px 18px;border-radius:9px;
+    border:none;font-size:.83rem;font-weight:700;cursor:pointer;
+    transition:var(--trans);display:inline-flex;align-items:center;gap:6px;
+  }
+  .export-btn:hover{background:#219a52;}
+</style>
+</head>
+<body>
+
+<!-- NOTIFICACIONES -->
+<div class="notif" id="notifContainer"></div>
+
+<!-- ============================================================
+     MODAL: REGISTRO DE ESTUDIANTE
+============================================================ -->
+<div class="modal-overlay" id="modal-registro">
+  <div class="modal-box">
+    <div class="modal-logo">🎓</div>
+    <h2>Bienvenido a FinanzasPro</h2>
+    <p class="sub">Registra tus datos para guardar tu progreso y que tu profesor pueda ver tus calificaciones.</p>
+    <div class="form-group">
+      <label>Nombre(s) *</label>
+      <input type="text" id="reg-nombre" placeholder="Tu nombre" maxlength="50" autocomplete="given-name">
+    </div>
+    <div class="form-group">
+      <label>Apellido(s) *</label>
+      <input type="text" id="reg-apellido" placeholder="Tu apellido" maxlength="50" autocomplete="family-name">
+    </div>
+    <div class="form-group">
+      <label>Correo institucional *</label>
+      <input type="email" id="reg-email" placeholder="usuario@universidad.edu.co" maxlength="100" autocomplete="email">
+    </div>
+    <div class="form-group">
+      <label>Grupo / Curso</label>
+      <input type="text" id="reg-grupo" placeholder="ej: Finanzas 2024-1 · Grupo A" maxlength="60">
+    </div>
+    <button class="btn btn-primary" style="width:100%;padding:13px;font-size:.95rem;margin-top:4px" onclick="registrarEstudiante()">
+      🚀 Ingresar a FinanzasPro
+    </button>
+    <div class="modal-divider">o si ya estás registrado</div>
+    <button class="btn" style="width:100%;background:var(--gris-cl);color:var(--azul);border:2px solid var(--gris);" onclick="mostrarLoginExistente()">
+      👤 Ingresar con correo existente
+    </button>
+    <div id="login-existente" style="display:none;margin-top:16px;">
+      <div class="form-group">
+        <label>Correo institucional registrado</label>
+        <input type="email" id="login-email" placeholder="Tu correo registrado">
+      </div>
+      <button class="btn btn-verde" style="width:100%" onclick="loginEstudiante()">Ingresar →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL: PERFIL DEL ESTUDIANTE
+============================================================ -->
+<div class="modal-overlay hidden" id="modal-perfil">
+  <div class="modal-box" style="max-width:420px;">
+    <button class="modal-close" onclick="cerrarModal('modal-perfil')">✕</button>
+    <div class="modal-logo" id="perfil-avatar-big">📚</div>
+    <h2 id="perfil-nombre-full">Nombre Apellido</h2>
+    <p class="sub" id="perfil-email-show">correo@universidad.edu.co</p>
+    <div class="stat-row" style="margin-bottom:20px;" id="perfil-stats"></div>
+    <div id="perfil-intentos-list"></div>
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn btn-primary" style="flex:1" onclick="cerrarModal('modal-perfil')">Cerrar</button>
+      <button class="btn" style="flex:1;background:var(--gris-cl);color:var(--rojo);border:2px solid #fecaca;" onclick="cerrarSesion()">Cerrar sesión</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     MODAL: CONTRASEÑA ADMIN
+============================================================ -->
+<div class="modal-overlay hidden" id="modal-admin-pass">
+  <div class="modal-box" style="max-width:380px;">
+    <button class="modal-close" onclick="cerrarModal('modal-admin-pass')">✕</button>
+    <div class="modal-logo" style="background:linear-gradient(135deg,#E74C3C,#C0392B);">🔐</div>
+    <h2>Panel Administrativo</h2>
+    <p class="sub">Acceso exclusivo para docentes. Ingresa la clave para ver las calificaciones de los estudiantes.</p>
+    <div class="form-group">
+      <label>Contraseña de administrador</label>
+      <input type="password" id="admin-pass-input" placeholder="Contraseña" onkeydown="if(event.key==='Enter')verificarAdminPass()">
+    </div>
+    <p id="admin-pass-error" style="color:var(--rojo);font-size:.8rem;margin-bottom:8px;display:none;">❌ Contraseña incorrecta. Intenta nuevamente.</p>
+    <button class="btn btn-primary" style="width:100%" onclick="verificarAdminPass()">Acceder →</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header>
+  <div class="header-inner">
+    <div class="logo">
+      <div class="logo-icon">📐</div>
+      <div class="logo-text">
+        <h1>FinanzasPro</h1>
+        <p>Matemáticas Financieras · Campus Virtual</p>
+      </div>
+    </div>
+    <div class="hud">
+      <div class="hud-stat"><span class="ico">⚡</span><span id="hud-racha">0</span> racha</div>
+      <div class="hud-stat"><span class="ico">🏆</span><span id="hud-score">0</span> pts</div>
+      <div class="badge-xp" id="hud-nivel">Principiante</div>
+      <div class="student-chip" id="student-chip" onclick="abrirPerfilModal()" style="display:none">
+        <div class="student-avatar" id="student-avatar">?</div>
+        <span class="student-name" id="student-chip-name">Estudiante</span>
+      </div>
+      <button class="btn-admin-header" onclick="abrirAdminModal()" title="Panel administrativo">🔒 Admin</button>
+    </div>
+  </div>
+</header>
+
+<!-- NAV TABS -->
+<div class="nav-bar">
+  <div class="nav-inner">
+    <button class="tab-btn active" onclick="showScreen('dash',this)">🏠 Inicio</button>
+    <button class="tab-btn" onclick="showScreen('tasas',this)">📊 Conversión de Tasas</button>
+    <button class="tab-btn" onclick="showScreen('amort',this)">📋 Amortización</button>
+    <button class="tab-btn" onclick="showScreen('ahorro',this)">💰 Ahorro con Cuotas</button>
+    <button class="tab-btn" onclick="showScreen('quiz',this)">🎮 Quiz <span class="tab-badge">¡Juega!</span></button>
+    <button class="tab-btn" id="tab-admin" onclick="showScreen('admin',this)" style="display:none;color:#E74C3C;">🔐 Admin</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAIN
+============================================================ -->
+<main>
+
+<!-- ===== DASHBOARD ===== -->
+<div class="screen active" id="screen-dash">
+  <div class="hero">
+    <h2>¡Bienvenido a FinanzasPro! 🎓</h2>
+    <p>Aprende matemáticas financieras paso a paso con ejercicios interactivos, calculadoras y juegos. Domina las conversiones de tasas, tablas de amortización y estrategias de ahorro.</p>
+    <div class="hero-actions">
+      <button class="btn btn-primary" onclick="showScreen('tasas', document.querySelectorAll('.tab-btn')[1])">🚀 Empezar ahora</button>
+      <button class="btn btn-outline" onclick="showScreen('quiz', document.querySelectorAll('.tab-btn')[4])">🎮 Ir al quiz</button>
+    </div>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-box">
+      <div class="val" id="st-puntos">0</div>
+      <div class="lbl">Puntos totales</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" id="st-quiz">0/15</div>
+      <div class="lbl">Quiz completado</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" id="st-calcs">0</div>
+      <div class="lbl">Cálculos realizados</div>
+    </div>
+    <div class="stat-box">
+      <div class="val" id="st-racha">0</div>
+      <div class="lbl">Racha actual</div>
+    </div>
+  </div>
+
+  <div class="cards-grid">
+    <div class="card" onclick="showScreen('tasas', document.querySelectorAll('.tab-btn')[1])">
+      <div class="card-icon icon-azul">📊</div>
+      <h3>Conversión de Tasas</h3>
+      <p>Convierte entre tasas nominales, efectivas, periódicas y continuas. Comprende la equivalencia de tasas con paso a paso visual.</p>
+      <div class="card-footer">
+        <div class="progress-bar-wrap"><div class="progress-bar" id="prog-tasas" style="width:0%"></div></div>
+        <div class="prog-label" id="prog-tasas-txt">0%</div>
+      </div>
+    </div>
+    <div class="card" onclick="showScreen('amort', document.querySelectorAll('.tab-btn')[2])">
+      <div class="card-icon icon-dorado">📋</div>
+      <h3>Tabla de Amortización</h3>
+      <p>Construye tablas de amortización sistema francés. Visualiza cómo se divide cada cuota entre interés y abono a capital.</p>
+      <div class="card-footer">
+        <div class="progress-bar-wrap"><div class="progress-bar" id="prog-amort" style="width:0%"></div></div>
+        <div class="prog-label" id="prog-amort-txt">0%</div>
+      </div>
+    </div>
+    <div class="card" onclick="showScreen('ahorro', document.querySelectorAll('.tab-btn')[3])">
+      <div class="card-icon icon-verde">💰</div>
+      <h3>Ahorro con Cuotas</h3>
+      <p>Planifica tu ahorro con anualidades ordinarias. Calcula cuánto debes ahorrar cada período para alcanzar tu meta.</p>
+      <div class="card-footer">
+        <div class="progress-bar-wrap"><div class="progress-bar" id="prog-ahorro" style="width:0%"></div></div>
+        <div class="prog-label" id="prog-ahorro-txt">0%</div>
+      </div>
+    </div>
+    <div class="card" onclick="showScreen('quiz', document.querySelectorAll('.tab-btn')[4])">
+      <div class="card-icon icon-rojo">🎮</div>
+      <h3>Quiz Interactivo</h3>
+      <p>Pon a prueba tu conocimiento con 15 preguntas de dificultad progresiva. Gana puntos y sube de nivel.</p>
+      <div class="card-footer">
+        <div class="progress-bar-wrap"><div class="progress-bar" id="prog-quiz" style="width:0%"></div></div>
+        <div class="prog-label" id="prog-quiz-txt">¡Juega!</div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="wave">
+  <div class="sec-header">
+    <div class="sec-icon">💡</div>
+    <div><h2>Conceptos clave del día</h2><p>Repasa los fundamentos antes de practicar</p></div>
+  </div>
+  <div class="two-col">
+    <div class="calc-card">
+      <h3>🔑 ¿Qué es la tasa efectiva?</h3>
+      <p style="font-size:.85rem;line-height:1.7;color:#4A5568;">
+        La <strong>tasa efectiva anual (TEA)</strong> representa el rendimiento real considerando la capitalización de intereses. Si un banco ofrece 24% nominal mensual, la tasa efectiva anual es mucho mayor porque los intereses se capitalizan cada mes.
+      </p>
+      <div class="tip-box">
+        <strong>💡 Regla de oro:</strong> Siempre compara créditos usando tasas efectivas anuales. La tasa nominal puede ser engañosa.
+      </div>
+    </div>
+    <div class="calc-card">
+      <h3>🏦 ¿Qué es amortizar?</h3>
+      <p style="font-size:.85rem;line-height:1.7;color:#4A5568;">
+        <strong>Amortizar</strong> significa extinguir gradualmente una deuda mediante pagos periódicos. En el sistema francés (cuota fija), cada pago incluye intereses sobre el saldo y un abono a capital que aumenta con el tiempo.
+      </p>
+      <div class="tip-box">
+        <strong>💡 Observa:</strong> Al inicio pagas más interés que capital. Con el tiempo, la proporción se invierte.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TASAS ===== -->
+<div class="screen" id="screen-tasas">
+  <div class="sec-header">
+    <div class="sec-icon">📊</div>
+    <div><h2>Conversión de Tasas de Interés</h2><p>Aprende a convertir entre diferentes tipos de tasas</p></div>
+  </div>
+
+  <div class="theory-tabs">
+    <button class="theory-tab active" onclick="showTheory('t-conceptos',this)">📖 Conceptos</button>
+    <button class="theory-tab" onclick="showTheory('t-formulas',this)">🔢 Fórmulas</button>
+    <button class="theory-tab" onclick="showTheory('t-calc',this)">🧮 Calculadora</button>
+    <button class="theory-tab" onclick="showTheory('t-equiv',this)">⚖️ Equivalencia</button>
+  </div>
+
+  <!-- CONCEPTOS -->
+  <div class="theory-panel active" id="t-conceptos">
+    <div class="two-col">
+      <div class="calc-card">
+        <h3>📌 Tasa Nominal (j)</h3>
+        <p style="font-size:.85rem;line-height:1.7;color:#4A5568;margin-bottom:12px;">
+          Es la tasa que <strong>enuncia</strong> el contrato, pero que requiere especificar la frecuencia de capitalización. Por sí sola no dice cuánto ganas realmente.
+        </p>
+        <div class="tag tag-azul">Ejemplo</div>
+        <p style="font-size:.82rem;margin-top:8px;color:#4A5568;">
+          "24% N.M.V." → 24% nominal, capitalizado mensualmente = 2% mensual.
+        </p>
+        <ul style="font-size:.82rem;color:#4A5568;margin-top:10px;padding-left:20px;line-height:1.8;">
+          <li><strong>N.M.V.</strong> = Nominal Mensual Vencido</li>
+          <li><strong>N.T.V.</strong> = Nominal Trimestral Vencido</li>
+          <li><strong>N.A.V.</strong> = Nominal Anual Vencido</li>
+        </ul>
+      </div>
+      <div class="calc-card">
+        <h3>✅ Tasa Efectiva (i)</h3>
+        <p style="font-size:.85rem;line-height:1.7;color:#4A5568;margin-bottom:12px;">
+          Es la tasa que <strong>realmente</strong> se gana o paga al cabo de un período, incluyendo el efecto de la capitalización compuesta.
+        </p>
+        <div class="tag tag-verde">Ejemplo</div>
+        <p style="font-size:.82rem;margin-top:8px;color:#4A5568;">
+          24% N.M.V. → Efectiva anual = (1 + 0.02)¹² − 1 = <strong>26.82% E.A.</strong>
+        </p>
+        <div class="tip-box" style="margin-top:10px;">
+          <strong>💡</strong> La tasa efectiva siempre es <em>mayor</em> que la nominal (excepto cuando m=1).
+        </div>
+      </div>
+    </div>
+    <div class="two-col" style="margin-top:16px;">
+      <div class="calc-card">
+        <h3>⏱️ Tasa Periódica (ip)</h3>
+        <p style="font-size:.85rem;line-height:1.7;color:#4A5568;">
+          Es la tasa correspondiente al <strong>período de capitalización</strong>. Si la tasa nominal es j capitalizable m veces al año:
+        </p>
+        <div class="formula-box" style="margin:12px 0;">
+          <div class="formula-ico">📐</div>
+          <div>
+            <div class="fbox-label">Tasa periódica</div>
+            <div class="math-expr">
+              i<sub>p</sub> <span class="meq">=</span>
+              <span class="mf"><span class="mn">j</span><span class="md">m</span></span>
+            </div>
+            <div class="fbox-desc">tasa nominal anual entre frecuencia de capitalización</div>
+          </div>
+        </div>
+        <p style="font-size:.82rem;color:#4A5568;">Ej: 24% N.T.V. → ip = 24%/4 = <strong>6% trimestral</strong></p>
+      </div>
+      <div class="calc-card" style="border-top:4px solid var(--azul-claro);">
+        <h3>∞ Tasa Continua (δ) — Tema nuevo</h3>
+
+        <!-- QUÉ ES -->
+        <div class="tip-box" style="margin-bottom:14px;border-color:var(--azul-claro);background:rgba(74,144,217,.07);">
+          <strong style="color:var(--azul);">💡 ¿Qué es la capitalización continua?</strong><br>
+          <span style="font-size:.83rem;line-height:1.7;">
+            Recuerda cómo pasamos de capitalización <em>anual</em> (m=1) → <em>mensual</em> (m=12) → <em>diaria</em> (m=365). Cada vez que aumentamos la frecuencia, el rendimiento efectivo crece un poco más.<br><br>
+            La <strong>tasa continua</strong> lleva ese proceso al límite: imagina que los intereses se capitalizan en <em>cada instante</em>, millones de veces por segundo, de forma ininterrumpida. Ese es el caso <strong>δ (delta)</strong>.
+          </span>
+        </div>
+
+        <!-- ANALOGÍA VISUAL -->
+        <p style="font-size:.83rem;line-height:1.7;color:#4A5568;margin-bottom:12px;">
+          <strong>Analogía:</strong> Es como la diferencia entre cobrar el salario cada mes, cada semana, cada día… o recibirlo <em>gota a gota</em>, segundo a segundo, sin parar. La capitalización continua es esa versión extrema del interés compuesto.
+        </p>
+
+        <!-- TABLA EVOLUCIÓN -->
+        <div style="overflow-x:auto;margin-bottom:14px;">
+          <table style="width:100%;border-collapse:collapse;font-size:.78rem;min-width:280px;">
+            <thead>
+              <tr style="background:var(--azul);color:#fff;">
+                <th style="padding:8px 10px;text-align:left;">Frecuencia</th>
+                <th style="padding:8px 10px;text-align:center;">m</th>
+                <th style="padding:8px 10px;text-align:right;">i<sub>E.A.</sub> (con δ=20%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom:1px solid var(--gris);">
+                <td style="padding:7px 10px;">Anual</td>
+                <td style="padding:7px 10px;text-align:center;">1</td>
+                <td style="padding:7px 10px;text-align:right;">20.000%</td>
+              </tr>
+              <tr style="background:var(--gris-cl);border-bottom:1px solid var(--gris);">
+                <td style="padding:7px 10px;">Semestral</td>
+                <td style="padding:7px 10px;text-align:center;">2</td>
+                <td style="padding:7px 10px;text-align:right;">21.000%</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--gris);">
+                <td style="padding:7px 10px;">Mensual</td>
+                <td style="padding:7px 10px;text-align:center;">12</td>
+                <td style="padding:7px 10px;text-align:right;">21.939%</td>
+              </tr>
+              <tr style="background:var(--gris-cl);border-bottom:1px solid var(--gris);">
+                <td style="padding:7px 10px;">Diaria</td>
+                <td style="padding:7px 10px;text-align:center;">365</td>
+                <td style="padding:7px 10px;text-align:right;">22.134%</td>
+              </tr>
+              <tr style="border-bottom:1px solid var(--gris);">
+                <td style="padding:7px 10px;">Por hora</td>
+                <td style="padding:7px 10px;text-align:center;">8.760</td>
+                <td style="padding:7px 10px;text-align:right;">22.139%</td>
+              </tr>
+              <tr style="background:rgba(74,144,217,.1);font-weight:700;">
+                <td style="padding:7px 10px;">Continua ∞</td>
+                <td style="padding:7px 10px;text-align:center;">∞</td>
+                <td style="padding:7px 10px;text-align:right;color:var(--azul);">22.140% ← límite</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- EL NÚMERO e -->
+        <div class="tip-box" style="border-color:var(--dorado);background:rgba(245,166,35,.07);margin-bottom:12px;">
+          <strong style="color:var(--dorado-os);">🔢 ¿Por qué aparece <em>e</em>?</strong><br>
+          <span style="font-size:.83rem;line-height:1.7;">
+            Cuando m → ∞ en la fórmula <strong>(1 + δ/m)<sup>m</sup></strong>, el resultado siempre converge al número de Euler: <strong>e ≈ 2.71828…</strong><br>
+            Este número matemático aparece de forma natural como el "multiplicador perfecto" del crecimiento continuo. Por eso la fórmula usa e<sup>δ</sup>.
+          </span>
+        </div>
+
+        <!-- FÓRMULAS -->
+        <div class="formula-box" style="margin:0 0 10px;">
+          <div class="formula-ico">∞</div>
+          <div>
+            <div class="fbox-label">Continua → Efectiva Anual</div>
+            <div class="math-expr">i<sub>E.A.</sub> <span class="meq">=</span> e<sup>δ</sup> − 1</div>
+            <div class="fbox-desc">dado δ, calcula la tasa efectiva equivalente</div>
+          </div>
+        </div>
+        <div class="formula-box" style="margin:0 0 12px;">
+          <div class="formula-ico">∞</div>
+          <div>
+            <div class="fbox-label">Efectiva Anual → Continua</div>
+            <div class="math-expr">δ <span class="meq">=</span> ln<span class="mp">(</span>1 + i<sub>E.A.</sub><span class="mp">)</span></div>
+            <div class="fbox-desc">dado i<sub>E.A.</sub>, calcula la tasa continua equivalente (logaritmo natural)</div>
+          </div>
+        </div>
+
+        <!-- EJEMPLO NUMÉRICO -->
+        <div style="background:rgba(39,174,96,.06);border:1px solid rgba(39,174,96,.2);border-radius:10px;padding:12px 16px;font-size:.82rem;line-height:1.8;">
+          <strong style="color:var(--verde);">✏️ Ejemplo resuelto:</strong><br>
+          Un bono del Estado se cotiza con tasa continua <strong>δ = 18% anual</strong>.<br>
+          ¿Cuál es la tasa efectiva anual equivalente?<br>
+          <strong>i<sub>E.A.</sub> = e<sup>0.18</sup> − 1 = 1.1972 − 1 = <span style="color:var(--azul);">19.72% E.A.</span></strong><br><br>
+          ¿Para qué sirve esto? Para comparar ese bono con un CDT que rinde 19% E.A. — el bono rinde más.
+        </div>
+
+        <!-- DÓNDE SE USA -->
+        <div class="tip-box" style="margin-top:12px;">
+          <strong>📌 ¿Dónde se usa en la vida real?</strong><br>
+          <span style="font-size:.82rem;line-height:1.8;">
+            • Valoración de <strong>opciones financieras</strong> (modelo Black-Scholes)<br>
+            • <strong>Bonos del gobierno</strong> en mercados internacionales<br>
+            • Modelos de <strong>crecimiento económico continuo</strong><br>
+            • Cálculo de <strong>tasas forward</strong> en mercados de divisas<br>
+            • Física y biología: crecimiento de poblaciones, decaimiento radioactivo
+          </span>
+        </div>
+      </div>
+    </div>
+    <div class="tip-box" style="margin-top:16px;">
+      <strong>🎯 Resumen rápido:</strong> Nominal → divide por m para obtener periódica. Periódica → capitaliza m veces para obtener efectiva. Efectiva → aplica logaritmo para obtener continua.
+    </div>
+  </div>
+
+  <!-- FÓRMULAS -->
+  <div class="theory-panel" id="t-formulas">
+    <ul class="step-list">
+      <li>
+        <div class="step-num">1</div>
+        <div>
+          <strong>Nominal → Efectiva Anual</strong>
+          <div class="formula-box" style="margin:10px 0 6px;">
+            <div class="formula-ico">🔄</div>
+            <div>
+              <div class="fbox-label">Nominal → Efectiva Anual</div>
+              <div class="math-expr">
+                i<sub>E.A.</sub> <span class="meq">=</span>
+                <span class="mp">(</span>1 +
+                <span class="mf"><span class="mn">j</span><span class="md">m</span></span>
+                <span class="mp">)</span><sup>m</sup> − 1
+              </div>
+              <div class="fbox-desc">j = tasa nominal anual &nbsp;·&nbsp; m = número de capitalizaciones por año</div>
+            </div>
+          </div>
+          <p style="font-size:.82rem;color:#4A5568;">Ejemplo: j=24% NMV, m=12 → i<sub>E.A.</sub> = (1+0.02)¹²−1 = <strong>26.82%</strong></p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">2</div>
+        <div>
+          <strong>Efectiva Anual → Nominal</strong>
+          <div class="formula-box" style="margin:10px 0 6px;">
+            <div class="formula-ico">🔄</div>
+            <div>
+              <div class="fbox-label">Efectiva Anual → Nominal</div>
+              <div class="math-expr">
+                j <span class="meq">=</span> m × <span style="font-size:1.3em;font-weight:300;">[</span>
+                <span class="mp">(</span>1 + i<sub>E.A.</sub><span class="mp">)</span><sup><span class="msf"><span class="msn">1</span><span class="msd">m</span></span></sup>
+                − 1 <span style="font-size:1.3em;font-weight:300;">]</span>
+              </div>
+              <div class="fbox-desc">despejando j de la fórmula anterior</div>
+            </div>
+          </div>
+          <p style="font-size:.82rem;color:#4A5568;">Ejemplo: i<sub>E.A.</sub>=26.82%, m=12 → j = 12×[(1.2682)^(1/12)−1] = <strong>24% NMV</strong></p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">3</div>
+        <div>
+          <strong>Efectiva Anual → Efectiva de otro período</strong>
+          <div class="formula-box" style="margin:10px 0 6px;">
+            <div class="formula-ico">⚡</div>
+            <div>
+              <div class="fbox-label">Efectiva Anual → Periódica</div>
+              <div class="math-expr">
+                i<sub>p</sub> <span class="meq">=</span>
+                <span class="mp">(</span>1 + i<sub>E.A.</sub><span class="mp">)</span><sup><span class="msf"><span class="msn">1</span><span class="msd">m</span></span></sup>
+                − 1
+              </div>
+              <div class="fbox-desc">m = número de períodos en el año</div>
+            </div>
+          </div>
+          <p style="font-size:.82rem;color:#4A5568;">Ejemplo: i<sub>E.A.</sub>=26.82%, mensual → i_m = (1.2682)^(1/12)−1 = <strong>2% EM</strong></p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">4</div>
+        <div>
+          <strong>Tasa Continua (δ) ↔ Efectiva Anual</strong>
+          <p style="font-size:.82rem;color:#718096;margin:6px 0 10px;line-height:1.6;">
+            La tasa continua es el <strong>límite teórico</strong> del interés compuesto cuando la capitalización ocurre infinitas veces por año. No existe un "período" — el dinero crece sin pausa, instante a instante. Usa el número de Euler <strong>e ≈ 2.71828</strong>.
+          </p>
+          <div class="formula-box" style="margin:10px 0 6px;">
+            <div class="formula-ico">∞</div>
+            <div>
+              <div class="fbox-label">Continua → Efectiva Anual</div>
+              <div class="math-expr">i<sub>E.A.</sub> <span class="meq">=</span> e<sup>δ</sup> − 1</div>
+              <div class="fbox-desc">e<sup>δ</sup> es la función exponencial natural evaluada en δ</div>
+            </div>
+          </div>
+          <div class="formula-box" style="margin:6px 0 10px;">
+            <div class="formula-ico">∞</div>
+            <div>
+              <div class="fbox-label">Efectiva Anual → Continua</div>
+              <div class="math-expr">δ <span class="meq">=</span> ln<span class="mp">(</span>1 + i<sub>E.A.</sub><span class="mp">)</span></div>
+              <div class="fbox-desc">ln es el logaritmo natural (base e), función inversa de e<sup>x</sup></div>
+            </div>
+          </div>
+          <p style="font-size:.82rem;color:#4A5568;">
+            Ejemplo: δ = 18% → i<sub>E.A.</sub> = e<sup>0.18</sup> − 1 = <strong>19.72% E.A.</strong><br>
+            Ejemplo inverso: i<sub>E.A.</sub> = 19.72% → δ = ln(1.1972) = <strong>18.00%</strong>
+          </p>
+        </div>
+      </li>
+      <li>
+        <div class="step-num">5</div>
+        <div>
+          <strong>Equivalencia entre dos tasas efectivas</strong>
+          <div class="formula-box" style="margin:10px 0 6px;">
+            <div class="formula-ico">⚖️</div>
+            <div>
+              <div class="fbox-label">Principio de equivalencia</div>
+              <div class="math-expr">
+                <span class="mp">(</span>1 + i<sub>1</sub><span class="mp">)</span><sup>n<sub style="font-size:.6em">1</sub></sup>
+                <span class="meq">=</span>
+                <span class="mp">(</span>1 + i<sub>2</sub><span class="mp">)</span><sup>n<sub style="font-size:.6em">2</sub></sup>
+              </div>
+              <div class="fbox-desc">dos tasas son equivalentes si producen el mismo resultado al final del período</div>
+            </div>
+          </div>
+          <p style="font-size:.82rem;color:#4A5568;">Ejemplo: 2% E.M. ↔ 26.82% E.A. (ambas equivalentes)</p>
+        </div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- CALCULADORA -->
+  <div class="theory-panel" id="t-calc">
+    <div class="calc-grid">
+      <div class="calc-card">
+        <h3>🔄 Nominal → Efectiva Anual</h3>
+        <div class="form-group">
+          <label>Tasa Nominal Anual (%)</label>
+          <input type="number" id="cn-nominal" placeholder="ej: 24" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Capitalización (veces/año)</label>
+          <select id="cn-m">
+            <option value="1">Anual (m=1)</option>
+            <option value="2">Semestral (m=2)</option>
+            <option value="4">Trimestral (m=4)</option>
+            <option value="12" selected>Mensual (m=12)</option>
+            <option value="52">Semanal (m=52)</option>
+            <option value="365">Diaria (m=365)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="calcNominalEfectiva()">Convertir →</button>
+        <div class="result-box" id="res-ne">
+          <div class="result-value">—</div>
+          <div class="result-label">Tasa Efectiva Anual</div>
+          <div class="steps-detail" id="steps-ne"></div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <h3>🔄 Efectiva Anual → Nominal</h3>
+        <div class="form-group">
+          <label>Tasa Efectiva Anual (%)</label>
+          <input type="number" id="cen-ea" placeholder="ej: 26.82" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Capitalización deseada (m)</label>
+          <select id="cen-m">
+            <option value="1">Anual (m=1)</option>
+            <option value="2">Semestral (m=2)</option>
+            <option value="4">Trimestral (m=4)</option>
+            <option value="12" selected>Mensual (m=12)</option>
+            <option value="52">Semanal (m=52)</option>
+            <option value="365">Diaria (m=365)</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="calcEfectivaNominal()">Convertir →</button>
+        <div class="result-box" id="res-en">
+          <div class="result-value">—</div>
+          <div class="result-label">Tasa Nominal Anual</div>
+          <div class="steps-detail" id="steps-en"></div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <h3>⚡ Efectiva Anual → Periódica</h3>
+        <div class="form-group">
+          <label>Tasa Efectiva Anual (%)</label>
+          <input type="number" id="cep-ea" placeholder="ej: 26.82" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Período deseado</label>
+          <select id="cep-per">
+            <option value="2">Semestral</option>
+            <option value="4">Trimestral</option>
+            <option value="12" selected>Mensual</option>
+            <option value="52">Semanal</option>
+            <option value="365">Diaria</option>
+          </select>
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="calcEfectivaPeriodica()">Convertir →</button>
+        <div class="result-box" id="res-ep">
+          <div class="result-value">—</div>
+          <div class="result-label">Tasa Periódica Efectiva</div>
+          <div class="steps-detail" id="steps-ep"></div>
+        </div>
+      </div>
+
+      <div class="calc-card">
+        <h3>∞ Continua ↔ Efectiva</h3>
+        <div class="form-group">
+          <label>Tipo de conversión</label>
+          <select id="cc-tipo">
+            <option value="cont-ef">Continua → Efectiva Anual</option>
+            <option value="ef-cont">Efectiva Anual → Continua</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Tasa (%)</label>
+          <input type="number" id="cc-tasa" placeholder="ej: 18" step="0.01">
+        </div>
+        <button class="btn btn-primary" style="width:100%" onclick="calcContinua()">Convertir →</button>
+        <div class="result-box" id="res-cc">
+          <div class="result-value">—</div>
+          <div class="result-label">Resultado</div>
+          <div class="steps-detail" id="steps-cc"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EQUIVALENCIA -->
+  <div class="theory-panel" id="t-equiv">
+    <div class="calc-card" style="max-width:620px;margin:0 auto;">
+      <h3>⚖️ Verificador de Equivalencia de Tasas</h3>
+      <p style="font-size:.83rem;color:#718096;margin-bottom:20px;">Ingresa dos tasas y comprueba si son equivalentes (rinden lo mismo en un año)</p>
+      <div class="two-col">
+        <div>
+          <div class="form-group">
+            <label>Tasa 1 (%)</label>
+            <input type="number" id="eq1-val" placeholder="ej: 2" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Período 1</label>
+            <select id="eq1-per">
+              <option value="1">Anual</option>
+              <option value="2">Semestral</option>
+              <option value="4">Trimestral</option>
+              <option value="12" selected>Mensual</option>
+              <option value="52">Semanal</option>
+              <option value="365">Diario</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <div class="form-group">
+            <label>Tasa 2 (%)</label>
+            <input type="number" id="eq2-val" placeholder="ej: 26.82" step="0.01">
+          </div>
+          <div class="form-group">
+            <label>Período 2</label>
+            <select id="eq2-per">
+              <option value="1" selected>Anual</option>
+              <option value="2">Semestral</option>
+              <option value="4">Trimestral</option>
+              <option value="12">Mensual</option>
+              <option value="52">Semanal</option>
+              <option value="365">Diario</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="verificarEquivalencia()">Verificar equivalencia</button>
+      <div class="result-box" id="res-eq" style="margin-top:16px;">
+        <div class="result-value">—</div>
+        <div class="result-label">Ingresa las tasas para verificar</div>
+        <div class="steps-detail" id="steps-eq"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AMORTIZACIÓN ===== -->
+<div class="screen" id="screen-amort">
+  <div class="sec-header">
+    <div class="sec-icon">📋</div>
+    <div><h2>Tabla de Amortización — Sistema Francés</h2><p>Cuota fija, interés decreciente, amortización creciente</p></div>
+  </div>
+
+  <div class="theory-tabs">
+    <button class="theory-tab active" onclick="showTheory('am-teoria',this)">📖 Teoría</button>
+    <button class="theory-tab" onclick="showTheory('am-calc',this)">🧮 Calculadora</button>
+    <button class="theory-tab" onclick="showTheory('am-tabla',this)">📋 Tabla generada</button>
+  </div>
+
+  <!-- TEORÍA AMORT -->
+  <div class="theory-panel active" id="am-teoria">
+    <div class="two-col">
+      <div>
+        <div class="calc-card">
+          <h3>🏗️ ¿Qué es el sistema francés?</h3>
+          <p style="font-size:.85rem;line-height:1.7;color:#4A5568;">
+            Es el sistema de amortización más usado en Colombia y el mundo para créditos hipotecarios y de consumo. Se caracteriza por <strong>cuota constante</strong> que incluye interés y capital.
+          </p>
+          <div class="tip-box">
+            <strong>Cuota = Interés + Amortización</strong><br>
+            La cuota nunca cambia, pero con el tiempo pagas menos interés y más capital.
+          </div>
+        </div>
+        <div class="calc-card" style="margin-top:16px;">
+          <h3>📐 Fórmulas clave</h3>
+          <div class="formula-box">
+            <div class="formula-ico">💳</div>
+            <div>
+              <div class="fbox-label">Cuota fija del crédito</div>
+              <div class="math-expr">
+                C <span class="meq">=</span>
+                <span class="mf">
+                  <span class="mn">P &thinsp;×&thinsp; i &thinsp;×&thinsp; <span class="mp">(</span>1 + i<span class="mp">)</span><sup>n</sup></span>
+                  <span class="md"><span class="mp">(</span>1 + i<span class="mp">)</span><sup>n</sup> − 1</span>
+                </span>
+              </div>
+              <div class="fbox-desc">P = capital prestado &nbsp;·&nbsp; i = tasa periódica &nbsp;·&nbsp; n = número de períodos</div>
+            </div>
+          </div>
+          <div class="formula-box" style="margin-top:8px;">
+            <div class="formula-ico">💰</div>
+            <div>
+              <div class="fbox-label">Interés del período k</div>
+              <div class="math-expr">
+                I<sub>k</sub> <span class="meq">=</span> S<sub>k−1</sub> &thinsp;×&thinsp; i
+              </div>
+              <div class="fbox-desc">saldo del período anterior multiplicado por la tasa</div>
+            </div>
+          </div>
+          <div class="formula-box" style="margin-top:8px;">
+            <div class="formula-ico">🏦</div>
+            <div>
+              <div class="fbox-label">Amortización del período k</div>
+              <div class="math-expr">
+                A<sub>k</sub> <span class="meq">=</span> C − I<sub>k</sub>
+              </div>
+              <div class="fbox-desc">porción de la cuota que abona al capital</div>
+            </div>
+          </div>
+          <div class="formula-box" style="margin-top:8px;">
+            <div class="formula-ico">📉</div>
+            <div>
+              <div class="fbox-label">Saldo al final del período k</div>
+              <div class="math-expr">
+                S<sub>k</sub> <span class="meq">=</span> S<sub>k−1</sub> − A<sub>k</sub>
+              </div>
+              <div class="fbox-desc">deuda pendiente que disminuye período a período</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="calc-card">
+          <h3>📊 Ejemplo paso a paso</h3>
+          <p style="font-size:.82rem;color:#718096;margin-bottom:12px;">Crédito $1.000.000 | 3 períodos | 2% mensual</p>
+          <ul class="step-list">
+            <li>
+              <div class="step-num">1</div>
+              <div style="font-size:.82rem;">
+                <strong>Calcular cuota fija:</strong><br>
+                C = 1.000.000 × 0.02×(1.02)³ / [(1.02)³−1]<br>
+                C = 1.000.000 × 0.021224 / 0.061208<br>
+                C = <strong>$346.755</strong>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">2</div>
+              <div style="font-size:.82rem;">
+                <strong>Período 1:</strong><br>
+                I₁ = 1.000.000 × 2% = <strong>$20.000</strong><br>
+                A₁ = 346.755 − 20.000 = <strong>$326.755</strong><br>
+                S₁ = 1.000.000 − 326.755 = <strong>$673.245</strong>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">3</div>
+              <div style="font-size:.82rem;">
+                <strong>Período 2:</strong><br>
+                I₂ = 673.245 × 2% = <strong>$13.465</strong><br>
+                A₂ = 346.755 − 13.465 = <strong>$333.290</strong><br>
+                S₂ = 673.245 − 333.290 = <strong>$339.955</strong>
+              </div>
+            </li>
+            <li>
+              <div class="step-num">4</div>
+              <div style="font-size:.82rem;">
+                <strong>Período 3:</strong><br>
+                I₃ = 339.955 × 2% = <strong>$6.799</strong><br>
+                A₃ = 346.755 − 6.799 = <strong>$339.956</strong><br>
+                S₃ ≈ <strong>$0</strong> ✅
+              </div>
+            </li>
+          </ul>
+          <div class="tip-box">
+            <strong>✅ Verificación:</strong> I₁+I₂+I₃ = $40.264 total de intereses pagados.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALC AMORT -->
+  <div class="theory-panel" id="am-calc">
+    <div class="calc-card" style="max-width:600px;margin:0 auto;">
+      <h3>🧮 Generador de tabla de amortización</h3>
+      <div class="two-col">
+        <div class="form-group">
+          <label>Monto del préstamo ($)</label>
+          <input type="number" id="am-capital" placeholder="ej: 10000000" value="10000000">
+        </div>
+        <div class="form-group">
+          <label>Tasa de interés (%)</label>
+          <input type="number" id="am-tasa" placeholder="ej: 2" step="0.001" value="2">
+        </div>
+        <div class="form-group">
+          <label>Número de períodos</label>
+          <input type="number" id="am-n" placeholder="ej: 12" value="12">
+        </div>
+        <div class="form-group">
+          <label>Tipo de tasa</label>
+          <select id="am-tipo">
+            <option value="mensual">Mensual</option>
+            <option value="trimestral">Trimestral</option>
+            <option value="anual">Anual</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary" style="width:100%;margin-top:8px" onclick="generarAmortizacion()">
+        📋 Generar tabla
+      </button>
+    </div>
+    <div id="am-resumen" style="display:none;margin-top:20px;">
+      <div class="stat-row" id="am-stats"></div>
+    </div>
+  </div>
+
+  <!-- TABLA AMORT -->
+  <div class="theory-panel" id="am-tabla">
+    <div id="am-tabla-content">
+      <div class="empty-state">
+        <div class="ico">📋</div>
+        <p>Genera una tabla desde la pestaña "Calculadora" para verla aquí.</p>
+        <button class="btn btn-primary btn-sm" style="margin-top:12px" onclick="showTheory('am-calc',document.querySelectorAll('#screen-amort .theory-tab')[1])">Ir a calculadora</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AHORRO ===== -->
+<div class="screen" id="screen-ahorro">
+  <div class="sec-header">
+    <div class="sec-icon">💰</div>
+    <div><h2>Ahorro con Cuotas Constantes</h2><p>Anualidades ordinarias: planifica tu futuro financiero</p></div>
+  </div>
+
+  <div class="theory-tabs">
+    <button class="theory-tab active" onclick="showTheory('ah-teoria',this)">📖 Conceptos</button>
+    <button class="theory-tab" onclick="showTheory('ah-calc',this)">🧮 Calculadora</button>
+    <button class="theory-tab" onclick="showTheory('ah-sim',this)">📈 Simulador visual</button>
+  </div>
+
+  <!-- TEORÍA AHORRO -->
+  <div class="theory-panel active" id="ah-teoria">
+    <div class="two-col">
+      <div class="calc-card">
+        <h3>💡 Anualidad Ordinaria (vencida)</h3>
+        <p style="font-size:.85rem;line-height:1.7;color:#4A5568;margin-bottom:12px;">
+          Serie de pagos <strong>iguales</strong> al final de cada período. Es el modelo de ahorro más común: abres una cuenta y depositas siempre la misma cantidad.
+        </p>
+        <div class="formula-box">
+          <div class="formula-ico">📈</div>
+          <div>
+            <div class="fbox-label">Valor Futuro de la anualidad</div>
+            <div class="math-expr">
+              VF <span class="meq">=</span> A &thinsp;×&thinsp;
+              <span class="mf">
+                <span class="mn"><span class="mp">(</span>1 + i<span class="mp">)</span><sup>n</sup> − 1</span>
+                <span class="md">i</span>
+              </span>
+            </div>
+            <div class="fbox-desc">A = cuota periódica &nbsp;·&nbsp; i = tasa &nbsp;·&nbsp; n = períodos</div>
+          </div>
+        </div>
+        <div class="formula-box" style="margin-top:8px;">
+          <div class="formula-ico">📉</div>
+          <div>
+            <div class="fbox-label">Valor Presente de la anualidad</div>
+            <div class="math-expr">
+              VP <span class="meq">=</span> A &thinsp;×&thinsp;
+              <span class="mf">
+                <span class="mn">1 − <span class="mp">(</span>1 + i<span class="mp">)</span><sup>−n</sup></span>
+                <span class="md">i</span>
+              </span>
+            </div>
+            <div class="fbox-desc">cuánto valen hoy todos los pagos futuros</div>
+          </div>
+        </div>
+        <div class="formula-box" style="margin-top:8px;">
+          <div class="formula-ico">💳</div>
+          <div>
+            <div class="fbox-label">Cuota necesaria para alcanzar una meta</div>
+            <div class="math-expr">
+              A <span class="meq">=</span>
+              <span class="mf">
+                <span class="mn">VF &thinsp;×&thinsp; i</span>
+                <span class="md"><span class="mp">(</span>1 + i<span class="mp">)</span><sup>n</sup> − 1</span>
+              </span>
+            </div>
+            <div class="fbox-desc">cuánto ahorrar cada período para llegar al valor futuro deseado</div>
+          </div>
+        </div>
+      </div>
+      <div class="calc-card">
+        <h3>🎯 Ejemplo: Meta de ahorro</h3>
+        <p style="font-size:.82rem;color:#718096;margin-bottom:12px;">
+          Quiero acumular <strong>$50.000.000</strong> en 5 años. Mi banco paga <strong>0.8% mensual</strong>. ¿Cuánto debo ahorrar cada mes?
+        </p>
+        <ul class="step-list">
+          <li>
+            <div class="step-num">1</div>
+            <div style="font-size:.82rem;">
+              <strong>Datos:</strong> VF=50.000.000, i=0.8%, n=60 meses
+            </div>
+          </li>
+          <li>
+            <div class="step-num">2</div>
+            <div style="font-size:.82rem;">
+              <strong>Fórmula:</strong> A = VF × i / [(1+i)ⁿ − 1]<br>
+              A = 50.000.000 × 0.008 / [(1.008)⁶⁰ − 1]
+            </div>
+          </li>
+          <li>
+            <div class="step-num">3</div>
+            <div style="font-size:.82rem;">
+              <strong>Calcular:</strong><br>
+              (1.008)⁶⁰ = 1.6135<br>
+              A = 400.000 / 0.6135 = <strong>$651.980 /mes</strong>
+            </div>
+          </li>
+          <li>
+            <div class="step-num">4</div>
+            <div style="font-size:.82rem;">
+              <strong>Total aportado:</strong> 651.980 × 60 = $39.119.000<br>
+              <strong>Intereses ganados:</strong> $10.881.000 🎉
+            </div>
+          </li>
+        </ul>
+        <div class="tip-box">
+          <strong>💡 El poder del tiempo:</strong> A mayor plazo, más ganan los intereses. ¡Empieza hoy!
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CALC AHORRO -->
+  <div class="theory-panel" id="ah-calc">
+    <div class="two-col">
+      <div class="calc-card">
+        <h3>🎯 ¿Cuánto debo ahorrar?</h3>
+        <p style="font-size:.8rem;color:#718096;margin-bottom:16px;">Calcula la cuota de ahorro para alcanzar una meta</p>
+        <div class="form-group">
+          <label>Meta de ahorro (Valor Futuro $)</label>
+          <input type="number" id="ah1-vf" placeholder="ej: 50000000">
+        </div>
+        <div class="form-group">
+          <label>Tasa de interés periódica (%)</label>
+          <input type="number" id="ah1-i" placeholder="ej: 0.8" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Número de períodos</label>
+          <input type="number" id="ah1-n" placeholder="ej: 60">
+        </div>
+        <button class="btn btn-verde" style="width:100%" onclick="calcCuotaAhorro()">Calcular cuota 💰</button>
+        <div class="result-box" id="res-ah1">
+          <div class="result-value">—</div>
+          <div class="result-label">Cuota de ahorro por período</div>
+          <div class="steps-detail" id="steps-ah1"></div>
+        </div>
+      </div>
+      <div class="calc-card">
+        <h3>📈 ¿Cuánto acumularé?</h3>
+        <p style="font-size:.8rem;color:#718096;margin-bottom:16px;">Calcula el valor futuro de tu plan de ahorro</p>
+        <div class="form-group">
+          <label>Cuota de ahorro por período ($)</label>
+          <input type="number" id="ah2-a" placeholder="ej: 500000">
+        </div>
+        <div class="form-group">
+          <label>Tasa de interés periódica (%)</label>
+          <input type="number" id="ah2-i" placeholder="ej: 0.8" step="0.01">
+        </div>
+        <div class="form-group">
+          <label>Número de períodos</label>
+          <input type="number" id="ah2-n" placeholder="ej: 36">
+        </div>
+        <button class="btn btn-verde" style="width:100%" onclick="calcValorFuturo()">Calcular valor futuro 📈</button>
+        <div class="result-box" id="res-ah2">
+          <div class="result-value">—</div>
+          <div class="result-label">Valor acumulado al final</div>
+          <div class="steps-detail" id="steps-ah2"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SIMULADOR VISUAL -->
+  <div class="theory-panel" id="ah-sim">
+    <div class="calc-card">
+      <h3>📊 Simulador visual de crecimiento</h3>
+      <div class="two-col" style="margin-bottom:20px;">
+        <div class="form-group">
+          <label>Cuota mensual ($)</label>
+          <input type="number" id="sim-a" placeholder="500000" value="500000" oninput="actualizarSimulador()">
+        </div>
+        <div class="form-group">
+          <label>Tasa mensual (%)</label>
+          <input type="number" id="sim-i" placeholder="0.8" value="0.8" step="0.01" oninput="actualizarSimulador()">
+        </div>
+        <div class="form-group">
+          <label>Años de ahorro</label>
+          <input type="number" id="sim-y" placeholder="5" value="5" min="1" max="30" oninput="actualizarSimulador()">
+        </div>
+        <div class="form-group">
+          <label>Depósito inicial ($)</label>
+          <input type="number" id="sim-p0" placeholder="0" value="0" oninput="actualizarSimulador()">
+        </div>
+      </div>
+      <div class="saving-visual" id="sim-visual">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div>
+            <div style="font-size:.75rem;color:#718096;">Valor acumulado</div>
+            <div style="font-size:1.8rem;font-weight:800;color:var(--azul);" id="sim-total">—</div>
+          </div>
+          <div style="text-align:right;">
+            <div style="font-size:.75rem;color:#718096;">Total aportado</div>
+            <div style="font-size:1.1rem;font-weight:700;color:#718096;" id="sim-aportado">—</div>
+            <div style="font-size:.75rem;color:var(--verde);font-weight:600;" id="sim-ganados">— en intereses</div>
+          </div>
+        </div>
+        <div class="saving-timeline" id="sim-bars"></div>
+        <div class="saving-labels" id="sim-labels"></div>
+        <div style="margin-top:16px;display:flex;gap:16px;flex-wrap:wrap;">
+          <div style="display:flex;align-items:center;gap:6px;font-size:.75rem;">
+            <div style="width:12px;height:12px;border-radius:3px;background:var(--azul);"></div>
+            <span>Valor acumulado</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px;font-size:.75rem;">
+            <div style="width:12px;height:12px;border-radius:3px;background:var(--dorado);"></div>
+            <span>Año actual seleccionado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== QUIZ ===== -->
+<div class="screen" id="screen-quiz">
+  <div class="sec-header">
+    <div class="sec-icon">🎮</div>
+    <div><h2>Quiz de Matemáticas Financieras</h2><p>15 preguntas de dificultad progresiva · Gana puntos · Sube de nivel</p></div>
+  </div>
+  <div class="quiz-wrap" id="quiz-main">
+    <div id="quiz-start-screen">
+      <div class="quiz-card">
+        <div style="font-size:4rem;margin-bottom:16px;">🎯</div>
+        <h2 style="margin-bottom:12px;">¿Listo para el reto?</h2>
+        <p style="color:#718096;margin-bottom:28px;line-height:1.6;">
+          15 preguntas sobre conversión de tasas, amortización y anualidades. Cada respuesta correcta suma puntos y mantiene tu racha. ¡Responde rápido para bonus de velocidad!
+        </p>
+        <div class="stat-row" style="margin-bottom:24px;">
+          <div class="stat-box"><div class="val">15</div><div class="lbl">Preguntas</div></div>
+          <div class="stat-box"><div class="val">3</div><div class="lbl">Niveles</div></div>
+          <div class="stat-box"><div class="val">100</div><div class="lbl">Pts máx</div></div>
+        </div>
+        <button class="btn btn-primary" style="font-size:1rem;padding:14px 36px" onclick="startQuiz()">🚀 Comenzar quiz</button>
+      </div>
+    </div>
+    <div id="quiz-question-screen" style="display:none;"></div>
+    <div id="quiz-result-screen" style="display:none;"></div>
+  </div>
+</div>
+
+<!-- ===== ADMIN PANEL ===== -->
+<div class="screen" id="screen-admin">
+  <div class="sec-header">
+    <div class="sec-icon" style="background:linear-gradient(135deg,#E74C3C,#C0392B);">🔐</div>
+    <div>
+      <h2>Panel Administrativo — Calificaciones</h2>
+      <p>Vista de docente · Todos los estudiantes registrados y sus intentos del quiz</p>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:10px;flex-wrap:wrap;">
+      <button class="export-btn" onclick="exportarCSV()">📥 Exportar CSV</button>
+      <button class="btn" style="background:var(--gris-cl);color:var(--rojo);border:2px solid #fecaca;padding:9px 16px;font-size:.82rem;font-weight:700;border-radius:9px;cursor:pointer;" onclick="confirmarLimpiarDatos()">🗑️ Limpiar datos</button>
+    </div>
+  </div>
+
+  <div class="admin-stat-banner" id="admin-stats-banner">
+    <!-- generado por JS -->
+  </div>
+
+  <div class="admin-filter-bar">
+    <input type="text" id="admin-search" placeholder="🔍 Buscar por nombre, correo o grupo..." oninput="filtrarEstudiantes()">
+    <select id="admin-filter-score" onchange="filtrarEstudiantes()" style="padding:9px 14px;border:2px solid var(--gris);border-radius:9px;font-size:.85rem;background:var(--blanco);outline:none;cursor:pointer;">
+      <option value="">Todos los puntajes</option>
+      <option value="a">Excelente (≥80%)</option>
+      <option value="b">Bueno (60-79%)</option>
+      <option value="c">Regular (40-59%)</option>
+      <option value="d">Bajo (&lt;40%)</option>
+      <option value="sin">Sin intentos</option>
+    </select>
+  </div>
+
+  <div id="admin-tabla-wrap">
+    <div class="empty-state">
+      <div class="ico">🎓</div>
+      <p>No hay estudiantes registrados aún.</p>
+    </div>
+  </div>
+
+  <p style="font-size:.72rem;color:#718096;margin-top:16px;text-align:center;">
+    Los datos se sincronizan con Firebase Firestore cuando la configuración está completa. También queda una copia local en este navegador y puedes exportar CSV.
+  </p>
+</div>
+
+</main>
+
+<!-- ============================================================
+     JAVASCRIPT
+============================================================ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  puntos: 0,
+  racha: 0,
+  calcCount: 0,
+  quizScore: 0,
+  quizDone: false,
+  progTasas: 0,
+  progAmort: 0,
+  progAhorro: 0,
+  amortData: null,
+};
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function showScreen(id, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  if (btn) btn.classList.add('active');
+  updateDashStats();
+}
+
+function showTheory(id, btn) {
+  const parent = btn.closest('.screen') || document.body;
+  parent.querySelectorAll('.theory-panel').forEach(p => p.classList.remove('active'));
+  parent.querySelectorAll('.theory-tab').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// ============================================================
+// HUD & STATS
+// ============================================================
+function addPoints(pts, reason) {
+  state.puntos += pts;
+  state.racha++;
+  updateHUD();
+  showNotif(`+${pts} pts — ${reason} 🎉`);
+  checkNivel();
+}
+
+function updateHUD() {
+  document.getElementById('hud-score').textContent = state.puntos;
+  document.getElementById('hud-racha').textContent = state.racha;
+  updateDashStats();
+}
+
+function checkNivel() {
+  const niveles = [
+    [0,'Principiante'],
+    [100,'Aprendiz'],
+    [300,'Estudiante'],
+    [600,'Avanzado'],
+    [1000,'Experto'],
+    [2000,'Maestro 🏆'],
+  ];
+  let nivel = 'Principiante';
+  for (const [min, n] of niveles) if (state.puntos >= min) nivel = n;
+  document.getElementById('hud-nivel').textContent = nivel;
+}
+
+function updateDashStats() {
+  document.getElementById('st-puntos').textContent = state.puntos;
+  document.getElementById('st-quiz').textContent = state.quizDone ? `${state.quizScore}/15` : '0/15';
+  document.getElementById('st-calcs').textContent = state.calcCount;
+  document.getElementById('st-racha').textContent = state.racha;
+  setBar('prog-tasas', state.progTasas);
+  setBar('prog-amort', state.progAmort);
+  setBar('prog-ahorro', state.progAhorro);
+  document.getElementById('prog-quiz-txt').textContent = state.quizDone ? `${Math.round(state.quizScore/15*100)}%` : '¡Juega!';
+  setBar('prog-quiz', state.quizDone ? Math.round(state.quizScore/15*100) : 0);
+}
+
+function setBar(id, val) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.width = val + '%';
+  const txt = document.getElementById(id + '-txt');
+  if (txt) txt.textContent = val + '%';
+}
+
+// ============================================================
+// NOTIFICATIONS
+// ============================================================
+function showNotif(msg, type='success') {
+  const c = document.getElementById('notifContainer');
+  const n = document.createElement('div');
+  n.className = 'notif-item' + (type==='error'?' error':'');
+  n.innerHTML = `<span>${type==='success'?'✅':'❌'}</span><span>${msg}</span>`;
+  c.appendChild(n);
+  setTimeout(() => { n.style.animation='slideOut .3s ease forwards'; setTimeout(() => n.remove(), 300); }, 3000);
+}
+
+// ============================================================
+// FORMAT
+// ============================================================
+const fmt = n => n.toLocaleString('es-CO', {minimumFractionDigits:2, maximumFractionDigits:2});
+const fmtPct = n => (n*100).toFixed(4) + '%';
+const fmtMoney = n => '$' + fmt(n);
+
+// ============================================================
+// RESULT BOX HELPER
+// ============================================================
+function showResult(boxId, value, label, steps) {
+  const box = document.getElementById(boxId);
+  box.classList.add('show');
+  box.querySelector('.result-value').textContent = value;
+  box.querySelector('.result-label').textContent = label;
+  const sd = box.querySelector('.steps-detail');
+  if (sd && steps) {
+    sd.innerHTML = steps.map(s =>
+      `<div class="step-detail-item"><span>${s[0]}</span><span>${s[1]}</span></div>`
+    ).join('');
+  }
+}
+
+function incCalc(module) {
+  state.calcCount++;
+  if (module==='tasas') state.progTasas = Math.min(100, state.progTasas+20);
+  if (module==='amort') state.progAmort = Math.min(100, state.progAmort+33);
+  if (module==='ahorro') state.progAhorro = Math.min(100, state.progAhorro+25);
+  addPoints(10, `Cálculo de ${module}`);
+}
+
+// ============================================================
+// TASAS — CALCULADORAS
+// ============================================================
+function calcNominalEfectiva() {
+  const j = parseFloat(document.getElementById('cn-nominal').value)/100;
+  const m = parseInt(document.getElementById('cn-m').value);
+  if (isNaN(j)||isNaN(m)||j<=0) { showNotif('Ingresa valores válidos','error'); return; }
+  const ip = j/m;
+  const ea = Math.pow(1+ip, m) - 1;
+  showResult('res-ne', fmtPct(ea), 'Tasa Efectiva Anual', [
+    ['Tasa periódica ip = j/m', fmtPct(ip)],
+    ['Factor (1 + ip)^m', (Math.pow(1+ip,m)).toFixed(6)],
+    ['TEA = factor − 1', fmtPct(ea)],
+  ]);
+  incCalc('tasas');
+}
+
+function calcEfectivaNominal() {
+  const ea = parseFloat(document.getElementById('cen-ea').value)/100;
+  const m = parseInt(document.getElementById('cen-m').value);
+  if (isNaN(ea)||isNaN(m)||ea<=0) { showNotif('Ingresa valores válidos','error'); return; }
+  const ip = Math.pow(1+ea, 1/m) - 1;
+  const j = ip * m;
+  showResult('res-en', fmtPct(j), `Tasa Nominal (capitalizable ${m}x/año)`, [
+    ['Tasa periódica ip = (1+EA)^(1/m)−1', fmtPct(ip)],
+    ['j = ip × m', fmtPct(j)],
+  ]);
+  incCalc('tasas');
+}
+
+function calcEfectivaPeriodica() {
+  const ea = parseFloat(document.getElementById('cep-ea').value)/100;
+  const m = parseInt(document.getElementById('cep-per').value);
+  if (isNaN(ea)||isNaN(m)||ea<=0) { showNotif('Ingresa valores válidos','error'); return; }
+  const ip = Math.pow(1+ea, 1/m) - 1;
+  const perNom = {2:'Semestral',4:'Trimestral',12:'Mensual',52:'Semanal',365:'Diaria'};
+  showResult('res-ep', fmtPct(ip), `Tasa Efectiva ${perNom[m]||'Periódica'}`, [
+    ['Fórmula: (1+EA)^(1/m)−1', ''],
+    ['(1 + '+fmtPct(ea)+')^(1/'+m+')', Math.pow(1+ea,1/m).toFixed(8)],
+    ['Tasa periódica efectiva', fmtPct(ip)],
+  ]);
+  incCalc('tasas');
+}
+
+function calcContinua() {
+  const tipo = document.getElementById('cc-tipo').value;
+  const t = parseFloat(document.getElementById('cc-tasa').value)/100;
+  if (isNaN(t)||t<=0) { showNotif('Ingresa valores válidos','error'); return; }
+  if (tipo==='cont-ef') {
+    const ea = Math.exp(t)-1;
+    showResult('res-cc', fmtPct(ea), 'Tasa Efectiva Anual equivalente', [
+      ['δ continua', fmtPct(t)],
+      ['e^δ', Math.exp(t).toFixed(6)],
+      ['TEA = e^δ − 1', fmtPct(ea)],
+    ]);
+  } else {
+    const delta = Math.log(1+t);
+    showResult('res-cc', fmtPct(delta), 'Tasa Continua equivalente', [
+      ['TEA', fmtPct(t)],
+      ['δ = ln(1 + TEA)', fmtPct(delta)],
+    ]);
+  }
+  incCalc('tasas');
+}
+
+function verificarEquivalencia() {
+  const t1 = parseFloat(document.getElementById('eq1-val').value)/100;
+  const m1 = parseInt(document.getElementById('eq1-per').value);
+  const t2 = parseFloat(document.getElementById('eq2-val').value)/100;
+  const m2 = parseInt(document.getElementById('eq2-per').value);
+  if ([t1,m1,t2,m2].some(isNaN)) { showNotif('Ingresa todos los valores','error'); return; }
+  const ea1 = Math.pow(1+t1, m1) - 1;
+  const ea2 = Math.pow(1+t2, m2) - 1;
+  const diff = Math.abs(ea1-ea2);
+  const equiv = diff < 0.0001;
+  const box = document.getElementById('res-eq');
+  box.classList.add('show');
+  box.querySelector('.result-value').textContent = equiv ? '✅ EQUIVALENTES' : '❌ NO equivalentes';
+  box.querySelector('.result-label').textContent = equiv ? 'Las tasas rinden lo mismo al año' : `Diferencia: ${fmtPct(diff)}`;
+  document.getElementById('steps-eq').innerHTML = [
+    ['EA equivalente tasa 1', fmtPct(ea1)],
+    ['EA equivalente tasa 2', fmtPct(ea2)],
+    ['Diferencia', fmtPct(diff)],
+    ['¿Equivalentes? (diff < 0.01%)', equiv ? 'SÍ' : 'NO'],
+  ].map(s=>`<div class="step-detail-item"><span>${s[0]}</span><span>${s[1]}</span></div>`).join('');
+  state.calcCount++;
+  updateDashStats();
+}
+
+// ============================================================
+// AMORTIZACIÓN
+// ============================================================
+function generarAmortizacion() {
+  const P = parseFloat(document.getElementById('am-capital').value);
+  const iAnual = parseFloat(document.getElementById('am-tasa').value)/100;
+  const n = parseInt(document.getElementById('am-n').value);
+  const tipo = document.getElementById('am-tipo').value;
+  if ([P,iAnual,n].some(isNaN)||P<=0||iAnual<=0||n<=0) {
+    showNotif('Ingresa valores válidos','error'); return;
+  }
+  const i = iAnual;
+  const cuota = P * i * Math.pow(1+i,n) / (Math.pow(1+i,n)-1);
+  let saldo = P;
+  const rows = [];
+  let totalInt = 0, totalAmort = 0;
+  for (let k=1; k<=n; k++) {
+    const interes = saldo * i;
+    const amort = cuota - interes;
+    saldo -= amort;
+    if (saldo < 0.01) saldo = 0;
+    totalInt += interes;
+    totalAmort += amort;
+    rows.push({ k, cuota, interes, amort, saldo });
+  }
+  state.amortData = { rows, cuota, totalInt, totalAmort, P, i, n, tipo };
+
+  // Resumen
+  const statsEl = document.getElementById('am-stats');
+  statsEl.innerHTML = `
+    <div class="stat-box"><div class="val">${fmtMoney(cuota)}</div><div class="lbl">Cuota fija (${tipo})</div></div>
+    <div class="stat-box"><div class="val">${fmtMoney(totalInt)}</div><div class="lbl">Total intereses</div></div>
+    <div class="stat-box"><div class="val">${fmtMoney(P+totalInt)}</div><div class="lbl">Total pagado</div></div>
+    <div class="stat-box"><div class="val">${fmt(totalInt/P*100)}%</div><div class="lbl">Costo del crédito</div></div>
+  `;
+  document.getElementById('am-resumen').style.display='block';
+
+  // Tabla
+  const tableHTML = `
+    <h3 style="margin-bottom:16px;color:var(--azul);">📋 Tabla de amortización — Sistema francés</h3>
+    <p style="font-size:.8rem;color:#718096;margin-bottom:16px;">Capital: ${fmtMoney(P)} | Tasa: ${fmt(i*100)}% ${tipo} | Períodos: ${n} | Cuota: ${fmtMoney(cuota)}</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>Período</th><th>Cuota</th><th>Interés</th><th>Amortización</th><th>Saldo</th>
+        </tr></thead>
+        <tbody>
+          ${rows.map((r,idx) => `
+            <tr class="${idx===0||idx===rows.length-1?'highlight-row':''}">
+              <td>${r.k}</td>
+              <td>${fmtMoney(r.cuota)}</td>
+              <td>${fmtMoney(r.interes)}</td>
+              <td>${fmtMoney(r.amort)}</td>
+              <td>${fmtMoney(r.saldo)}</td>
+            </tr>
+          `).join('')}
+        </tbody>
+        <tfoot><tr>
+          <td>TOTAL</td>
+          <td>${fmtMoney(cuota*n)}</td>
+          <td>${fmtMoney(totalInt)}</td>
+          <td>${fmtMoney(P)}</td>
+          <td>—</td>
+        </tr></tfoot>
+      </table>
+    </div>
+  `;
+  document.getElementById('am-tabla-content').innerHTML = tableHTML;
+  showTheory('am-tabla', document.querySelectorAll('#screen-amort .theory-tab')[2]);
+  incCalc('amort');
+}
+
+// ============================================================
+// AHORRO
+// ============================================================
+function calcCuotaAhorro() {
+  const VF = parseFloat(document.getElementById('ah1-vf').value);
+  const i = parseFloat(document.getElementById('ah1-i').value)/100;
+  const n = parseInt(document.getElementById('ah1-n').value);
+  if ([VF,i,n].some(isNaN)||VF<=0||i<=0||n<=0) { showNotif('Ingresa valores válidos','error'); return; }
+  const A = VF * i / (Math.pow(1+i,n)-1);
+  const totalAport = A*n;
+  const intereses = VF - totalAport;
+  showResult('res-ah1', fmtMoney(A), 'Cuota de ahorro por período', [
+    ['VF objetivo', fmtMoney(VF)],
+    ['Períodos n', n],
+    ['Tasa i', fmtPct(i)],
+    ['Total a aportar', fmtMoney(totalAport)],
+    ['Intereses ganados 🎉', fmtMoney(intereses)],
+    ['Rentabilidad', fmt(intereses/totalAport*100)+'%'],
+  ]);
+  incCalc('ahorro');
+}
+
+function calcValorFuturo() {
+  const A = parseFloat(document.getElementById('ah2-a').value);
+  const i = parseFloat(document.getElementById('ah2-i').value)/100;
+  const n = parseInt(document.getElementById('ah2-n').value);
+  if ([A,i,n].some(isNaN)||A<=0||i<=0||n<=0) { showNotif('Ingresa valores válidos','error'); return; }
+  const VF = A * (Math.pow(1+i,n)-1) / i;
+  const totalAport = A*n;
+  const intereses = VF - totalAport;
+  showResult('res-ah2', fmtMoney(VF), 'Valor futuro acumulado', [
+    ['Cuota A', fmtMoney(A)],
+    ['Períodos n', n],
+    ['Tasa i', fmtPct(i)],
+    ['Total aportado', fmtMoney(totalAport)],
+    ['Intereses ganados 🎉', fmtMoney(intereses)],
+    ['Multiplicador de riqueza', fmt(VF/totalAport)+'x'],
+  ]);
+  incCalc('ahorro');
+}
+
+// ============================================================
+// SIMULADOR VISUAL
+// ============================================================
+function actualizarSimulador() {
+  const A = parseFloat(document.getElementById('sim-a').value)||0;
+  const i = parseFloat(document.getElementById('sim-i').value)/100||0;
+  const years = parseInt(document.getElementById('sim-y').value)||5;
+  const P0 = parseFloat(document.getElementById('sim-p0').value)||0;
+  if (A<=0||i<=0||years<=0) return;
+
+  const barsContainer = document.getElementById('sim-bars');
+  const labelsContainer = document.getElementById('sim-labels');
+  const maxY = Math.min(years, 20);
+  const valores = [];
+  for (let y=1; y<=maxY; y++) {
+    const n = y*12;
+    const VF = P0*Math.pow(1+i,n) + A*(Math.pow(1+i,n)-1)/i;
+    valores.push(VF);
+  }
+  const maxVal = Math.max(...valores);
+  const totalAport = A*maxY*12 + P0;
+  const vfFinal = valores[valores.length-1];
+  const intereses = vfFinal - totalAport;
+
+  document.getElementById('sim-total').textContent = fmtMoney(vfFinal);
+  document.getElementById('sim-aportado').textContent = fmtMoney(totalAport);
+  document.getElementById('sim-ganados').textContent = `+${fmtMoney(intereses)} en intereses`;
+
+  barsContainer.innerHTML = valores.map((v,idx) =>
+    `<div class="saving-bar ${idx===valores.length-1?'highlight':''}"
+      style="height:${Math.max(10, v/maxVal*110)}px"
+      data-label="${fmtMoney(v)}"></div>`
+  ).join('');
+  labelsContainer.innerHTML = valores.map((_,idx) =>
+    `<span>Año ${idx+1}</span>`
+  ).join('');
+}
+
+// ============================================================
+// QUIZ DATA
+// ============================================================
+const QUIZ = [
+  // NIVEL 1 — Básico
+  {
+    nivel:'🟢 Básico', tema:'Tasa Nominal',
+    pregunta:'Una tasa de 24% N.M.V. equivale a una tasa periódica mensual de:',
+    opciones:['2% mensual','24% mensual','12% semestral','6% trimestral'],
+    correcta:0,
+    explicacion:'24% N.M.V. significa 24% nominal capitalizable mensualmente. La tasa periódica mensual es j/m = 24%/12 = 2% mensual.',
+  },
+  {
+    nivel:'🟢 Básico', tema:'Tasa Efectiva',
+    pregunta:'¿Cuál de las siguientes afirmaciones sobre la tasa efectiva anual (TEA) es CORRECTA?',
+    opciones:['TEA < tasa nominal siempre','TEA incluye el efecto de capitalización compuesta','TEA = tasa nominal cuando m=12','TEA solo aplica para créditos hipotecarios'],
+    correcta:1,
+    explicacion:'La TEA refleja el rendimiento real incluyendo la capitalización compuesta. Es mayor que la nominal excepto cuando m=1 (capitalización anual).',
+  },
+  {
+    nivel:'🟢 Básico', tema:'Amortización',
+    pregunta:'En el sistema francés de amortización, la cuota periódica es:',
+    opciones:['Creciente con el tiempo','Decreciente con el tiempo','Constante durante todo el plazo','Variable según la inflación'],
+    correcta:2,
+    explicacion:'El sistema francés se caracteriza precisamente por tener cuota CONSTANTE. Lo que varía es la composición: al inicio más interés, al final más capital.',
+  },
+  {
+    nivel:'🟢 Básico', tema:'Anualidades',
+    pregunta:'En una anualidad ordinaria, ¿cuándo se realizan los pagos?',
+    opciones:['Al inicio de cada período','Al final de cada período','En cualquier momento del período','Una sola vez al final'],
+    correcta:1,
+    explicacion:'Anualidad ORDINARIA (o vencida) significa que los pagos se hacen AL FINAL de cada período. Si fueran al inicio sería anualidad anticipada (prepagable).',
+  },
+  {
+    nivel:'🟢 Básico', tema:'Conceptos',
+    pregunta:'¿Qué representa el "saldo" en una tabla de amortización?',
+    opciones:['El total de intereses pagados','La cuota mensual','La deuda pendiente después de cada pago','El total de amortizaciones acumuladas'],
+    correcta:2,
+    explicacion:'El saldo es el capital que aún se debe después de cada pago. Va disminuyendo período a período hasta llegar a cero al final del plazo.',
+  },
+  // NIVEL 2 — Intermedio
+  {
+    nivel:'🟡 Intermedio', tema:'Conversión',
+    pregunta:'Una tasa efectiva anual del 26.82% corresponde a una tasa efectiva mensual de aproximadamente:',
+    formula:`<span class="math-expr">i<sub>m</sub> <span class="meq">=</span> <span class="mp">(</span>1 + i<sub>E.A.</sub><span class="mp">)</span><sup><span class="msf"><span class="msn">1</span><span class="msd">12</span></span></sup> − 1</span>`,
+    opciones:['2.00%','2.24%','22.35%','0.167%'],
+    correcta:0,
+    explicacion:'i<sub>m</sub> = (1.2682)<sup>1/12</sup> − 1 = 1.02 − 1 = 2.00% mensual. Este es el resultado exacto porque 26.82% E.A. es precisamente equivalente a 2% mensual.',
+  },
+  {
+    nivel:'🟡 Intermedio', tema:'Conversión',
+    pregunta:'¿Cuál es la tasa efectiva anual equivalente a una tasa nominal del 18% capitalizable trimestralmente?',
+    formula:`<span class="math-expr">i<sub>E.A.</sub> <span class="meq">=</span> <span class="mp">(</span>1 + <span class="mf"><span class="mn">0.18</span><span class="md">4</span></span><span class="mp">)</span><sup>4</sup> − 1</span>`,
+    opciones:['18.00%','19.25%','4.50%','17.50%'],
+    correcta:1,
+    explicacion:'i<sub>E.A.</sub> = (1 + 0.045)^4 − 1 = (1.045)^4 − 1 = 1.1925 − 1 = 19.25% E.A. La capitalización trimestral eleva la tasa efectiva por encima del nominal.',
+  },
+  {
+    nivel:'🟡 Intermedio', tema:'Amortización',
+    pregunta:'Un crédito de $5.000.000 al 2% mensual a 24 meses. ¿Cuál es la cuota fija aproximada?',
+    formula:`<span class="math-expr">C <span class="meq">=</span> <span class="mf"><span class="mn">P &thinsp;×&thinsp; i &thinsp;×&thinsp; <span class="mp">(</span>1+i<span class="mp">)</span><sup>n</sup></span><span class="md"><span class="mp">(</span>1+i<span class="mp">)</span><sup>n</sup> − 1</span></span></span>`,
+    opciones:['$264.355','$208.333','$312.200','$235.000'],
+    correcta:0,
+    explicacion:'C = 5.000.000 × 0.02×(1.02)^24 / [(1.02)^24−1] = 5.000.000 × 0.02×1.6084 / 0.6084 = 5.000.000 × 0.052871 ≈ $264.355.',
+  },
+  {
+    nivel:'🟡 Intermedio', tema:'Anualidades',
+    pregunta:'Si ahorras $300.000 mensuales durante 24 meses a una tasa del 1% mensual, ¿cuánto acumulas?',
+    formula:`<span class="math-expr">VF <span class="meq">=</span> A &thinsp;×&thinsp; <span class="mf"><span class="mn"><span class="mp">(</span>1+i<span class="mp">)</span><sup>n</sup> − 1</span><span class="md">i</span></span></span>`,
+    opciones:['$7.200.000','$8.196.000','$8.092.000','$7.800.000'],
+    correcta:2,
+    explicacion:'VF = 300.000 × [(1.01)^24 − 1] / 0.01 = 300.000 × [1.2697 − 1] / 0.01 = 300.000 × 26.97 ≈ $8.092.000.',
+  },
+  {
+    nivel:'🟡 Intermedio', tema:'Tasa Continua',
+    pregunta:'Una tasa continua del 15% anual equivale a una tasa efectiva anual de aproximadamente:',
+    formula:`<span class="math-expr">i<sub>E.A.</sub> <span class="meq">=</span> e<sup>δ</sup> − 1</span>`,
+    opciones:['15.00%','16.18%','14.00%','17.35%'],
+    correcta:1,
+    explicacion:'i<sub>E.A.</sub> = e^0.15 − 1 = 1.1618 − 1 = 16.18%. La capitalización continua siempre produce una tasa efectiva mayor que la tasa continua.',
+  },
+  // NIVEL 3 — Avanzado
+  {
+    nivel:'🔴 Avanzado', tema:'Análisis',
+    pregunta:'En los primeros períodos de un crédito (sistema francés), ¿qué proporción representa el interés sobre la cuota total?',
+    opciones:['Mayor que en los últimos períodos','Igual en todos los períodos','Menor que en los últimos períodos','Cero en el primer período'],
+    correcta:0,
+    explicacion:'Al inicio el saldo es máximo, por eso el interés (Saldo × i) es máximo. Con cada pago el saldo disminuye, el interés baja y la amortización sube. Al final, la cuota es casi toda capital.',
+  },
+  {
+    nivel:'🔴 Avanzado', tema:'VPN',
+    pregunta:'El Valor Presente de una anualidad de $500.000 durante 36 meses al 0.8% mensual es aproximadamente:',
+    formula:`<span class="math-expr">VP <span class="meq">=</span> A &thinsp;×&thinsp; <span class="mf"><span class="mn">1 − <span class="mp">(</span>1+i<span class="mp">)</span><sup>−n</sup></span><span class="md">i</span></span></span>`,
+    opciones:['$18.000.000','$15.586.000','$17.200.000','$16.500.000'],
+    correcta:1,
+    explicacion:'VP = 500.000 × [1 − (1.008)^−36] / 0.008 = 500.000 × [1 − 0.7506] / 0.008 = 500.000 × 31.172 ≈ $15.586.000.',
+  },
+  {
+    nivel:'🔴 Avanzado', tema:'Equivalencia',
+    pregunta:'¿Cuál de las siguientes tasas NO es equivalente a 24% N.M.V.?',
+    opciones:['2% efectivo mensual','26.82% E.A.','6.00% efectivo trimestral','12.62% efectivo semestral'],
+    correcta:2,
+    explicacion:'24% N.M.V. equivale a 2% mensual, 26.82% E.A. y 12.62% semestral (=(1.02)<sup>6</sup>−1=12.62%). La tasa trimestral equivalente sería (1.02)<sup>3</sup>−1=6.12%, no 6.00%. Por eso 6.00% trimestral NO es equivalente.',
+  },
+  {
+    nivel:'🔴 Avanzado', tema:'Ahorro',
+    pregunta:'Para acumular $100.000.000 en 10 años ahorrando mensualmente al 0.6% mensual, la cuota mensual requerida es:',
+    formula:`<span class="math-expr">A <span class="meq">=</span> <span class="mf"><span class="mn">VF &thinsp;×&thinsp; i</span><span class="md"><span class="mp">(</span>1+i<span class="mp">)</span><sup>n</sup> − 1</span></span></span>`,
+    opciones:['$571.400','$833.333','$498.000','$627.000'],
+    correcta:0,
+    explicacion:'A = 100.000.000 × 0.006 / [(1.006)^120 − 1] = 600.000 / [2.0502 − 1] = 600.000 / 1.0502 ≈ $571.400.',
+  },
+  {
+    nivel:'🔴 Avanzado', tema:'Integración',
+    pregunta:'Un inversionista tiene dos opciones: A) 28% E.A. o B) 2.1% mensual capitalizable. ¿Cuál conviene más como inversión?',
+    opciones:['Opción A — 28% E.A.','Opción B — 2.1% mensual','Son completamente iguales','Depende del plazo'],
+    correcta:1,
+    explicacion:'Convertimos B: (1.021)^12 − 1 = 28.35% E.A. Como 28.35% > 28%, la opción B rinde MÁS. Siempre hay que convertir a la misma base para comparar tasas.',
+  },
+];
+
+// ============================================================
+// QUIZ ENGINE
+// ============================================================
+let quizState = { current:0, score:0, streak:0, startTime:0, answers:[] };
+
+function startQuiz() {
+  quizState = { current:0, score:0, streak:0, startTime:Date.now(), answers:[] };
+  document.getElementById('quiz-start-screen').style.display='none';
+  document.getElementById('quiz-result-screen').style.display='none';
+  document.getElementById('quiz-question-screen').style.display='block';
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUIZ[quizState.current];
+  const idx = quizState.current;
+  const pct = (idx / QUIZ.length) * 100;
+  const html = `
+    <div class="quiz-header">
+      <span style="font-size:.8rem;font-weight:700;color:var(--azul);">${q.nivel} · ${q.tema}</span>
+      <div class="quiz-progress-wrap"><div class="quiz-progress" style="width:${pct}%"></div></div>
+      <span style="font-size:.8rem;font-weight:700;color:#718096;">${idx+1}/${QUIZ.length}</span>
+    </div>
+    <div class="quiz-card">
+      <div class="q-num">Pregunta ${idx+1} de ${QUIZ.length}</div>
+      <div class="q-text">${q.pregunta}</div>
+      ${q.formula ? `<div class="q-formula">${q.formula}</div>` : ''}
+      <div class="q-options">
+        ${q.opciones.map((o,i) => `
+          <button class="q-opt" onclick="responder(${i})" id="opt-${i}">${o}</button>
+        `).join('')}
+      </div>
+      <div class="q-explanation" id="q-expl">
+        💡 ${q.explicacion}
+      </div>
+    </div>
+  `;
+  document.getElementById('quiz-question-screen').innerHTML = html;
+  document.getElementById('quiz-question-screen').style.animation='none';
+  setTimeout(()=> document.getElementById('quiz-question-screen').style.animation='fadeUp .3s ease', 10);
+}
+
+function responder(idx) {
+  const q = QUIZ[quizState.current];
+  const opts = document.querySelectorAll('.q-opt');
+  opts.forEach(o => o.classList.add('disabled'));
+  const correct = idx === q.correcta;
+  opts[q.correcta].classList.add('correct');
+  if (!correct) opts[idx].classList.add('wrong');
+  document.getElementById('q-expl').classList.add('show');
+  quizState.answers.push(correct);
+  if (correct) {
+    quizState.score++;
+    quizState.streak++;
+    const bonus = quizState.streak >= 3 ? 15 : 10;
+    state.puntos += bonus;
+    state.racha = quizState.streak;
+    showNotif(`✅ Correcto${quizState.streak>=3?' 🔥 Racha x'+quizState.streak:''}! +${bonus} pts`);
+  } else {
+    quizState.streak = 0;
+    showNotif('❌ Incorrecto. Lee la explicación 📖', 'error');
+  }
+  updateHUD();
+  setTimeout(() => {
+    quizState.current++;
+    if (quizState.current < QUIZ.length) renderQuestion();
+    else mostrarResultado();
+  }, correct ? 1800 : 2800);
+}
+
+function mostrarResultado() {
+  const score = quizState.score;
+  const pct = Math.round(score/QUIZ.length*100);
+  const tiempoSeg = Math.round((Date.now() - quizState.startTime) / 1000);
+  state.quizScore = score;
+  state.quizDone = true;
+
+  // Guardar intento en cache local y Firestore si está configurado
+  guardarIntentoQuiz(score, pct, state.puntos, tiempoSeg);
+
+  const est = getCurrentStudent();
+  const intentosEst = est ? (est.intentos ? est.intentos.length + 1 : 1) : null;
+  // Recargar para obtener el intento recién guardado
+  const estAct = getCurrentStudent();
+  const todosIntentos = estAct ? estAct.intentos || [] : [];
+  const mejorHist = todosIntentos.length ? Math.max(...todosIntentos.map(i=>i.pct)) : pct;
+  const esMejor = todosIntentos.length <= 1 || pct >= mejorHist;
+
+  const msg = pct>=80 ? '¡Excelente dominio financiero! 🏆' :
+              pct>=60 ? '¡Buen trabajo! Sigue practicando 💪' :
+              'Repasa los módulos teóricos y vuelve a intentarlo 📚';
+  const minutos = Math.floor(tiempoSeg/60);
+  const segs = tiempoSeg % 60;
+
+  document.getElementById('quiz-question-screen').style.display='none';
+  document.getElementById('quiz-result-screen').style.display='block';
+  document.getElementById('quiz-result-screen').innerHTML = `
+    <div class="score-card">
+      <div class="score-circle">${pct}%</div>
+      <h2>${score} de ${QUIZ.length} correctas</h2>
+      <p style="color:#718096;margin-bottom:4px;">${msg}</p>
+      ${esMejor && todosIntentos.length > 1 ? '<p style="color:var(--verde);font-weight:700;font-size:.85rem;margin-bottom:4px;">🏅 ¡Nuevo mejor puntaje personal!</p>' : ''}
+      ${est ? `<p style="font-size:.8rem;color:#718096;margin-bottom:4px;">Intento #${todosIntentos.length} · Guardado en tu historial</p>` : ''}
+      <p style="font-size:.82rem;color:#718096;margin-bottom:24px;">
+        Tiempo: <strong>${minutos}m ${segs}s</strong> · Puntos: <strong style="color:var(--azul);">${state.puntos}</strong>
+      </p>
+      <div class="stat-row" style="margin-bottom:24px;">
+        <div class="stat-box"><div class="val" style="color:var(--verde);">${score}</div><div class="lbl">Correctas</div></div>
+        <div class="stat-box"><div class="val" style="color:var(--rojo);">${QUIZ.length-score}</div><div class="lbl">Incorrectas</div></div>
+        <div class="stat-box"><div class="val">${quizState.streak}</div><div class="lbl">Racha final</div></div>
+        ${est ? `<div class="stat-box"><div class="val">${todosIntentos.length}</div><div class="lbl">Total intentos</div></div>` : ''}
+      </div>
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-primary" onclick="startQuiz()">🔄 Intentar de nuevo</button>
+        ${est ? `<button class="btn btn-verde" onclick="abrirPerfilModal()">📊 Ver mi historial</button>` : ''}
+        <button class="btn btn-outline" style="background:var(--azul);color:#fff;" onclick="showScreen('dash',document.querySelectorAll('.tab-btn')[0])">🏠 Ver progreso</button>
+      </div>
+    </div>
+  `;
+  updateDashStats();
+}
+
+// ============================================================
+// FIREBASE + LOCAL CACHE SCHEMA
+// Firestore: students/{id}
+// Local cache: finanzapro_students : [{id, nombre, apellido, email, grupo, registrado, intentos:[{fecha,score,pct,puntos,tiempo}]}]
+// Session: finanzapro_current  : student id string
+// ============================================================
+const LS_KEY = 'finanzapro_students';
+const LS_CUR = 'finanzapro_current';
+const ADMIN_PASS = 'cesmagadmin*';
+const FIREBASE_COLLECTION = 'students';
+
+// Pega aquí la configuración real desde Firebase Console > Configuración del proyecto > Tus apps > SDK setup and configuration.
+// La URL compartida confirma el proyecto "matematicas-financieras-game", pero no contiene apiKey, messagingSenderId ni appId completos.
+const firebaseConfig = {
+  apiKey: '',
+  authDomain: 'matematicas-financieras-game.firebaseapp.com',
+  projectId: 'matematicas-financieras-game',
+  storageBucket: 'matematicas-financieras-game.appspot.com',
+  messagingSenderId: '',
+  appId: ''
+};
+
+let db = null;
+let firebaseOnline = false;
+
+function firebaseConfigured() {
+  return Boolean(
+    window.firebase &&
+    firebaseConfig.apiKey &&
+    firebaseConfig.projectId &&
+    firebaseConfig.appId
+  );
+}
+
+function initFirebase() {
+  if (!firebaseConfigured()) {
+    console.info('Firebase no está configurado. La app usará localStorage.');
+    return false;
+  }
+  try {
+    if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    db = firebase.firestore();
+    firebaseOnline = true;
+    db.enablePersistence({ synchronizeTabs: true }).catch(() => {});
+    return true;
+  } catch (err) {
+    firebaseOnline = false;
+    console.error('No se pudo inicializar Firebase:', err);
+    showNotif('Firebase no inició; se guardará localmente', 'error');
+    return false;
+  }
+}
+
+function getStudents() {
+  try { return JSON.parse(localStorage.getItem(LS_KEY)) || []; }
+  catch { return []; }
+}
+function saveStudents(arr) { localStorage.setItem(LS_KEY, JSON.stringify(arr)); }
+function getCurrentId() { return localStorage.getItem(LS_CUR) || null; }
+function getCurrentStudent() {
+  const id = getCurrentId();
+  return id ? getStudents().find(s => s.id === id) || null : null;
+}
+
+function normalizeStudent(raw) {
+  return {
+    id: String(raw.id || ''),
+    nombre: String(raw.nombre || ''),
+    apellido: String(raw.apellido || ''),
+    email: String(raw.email || '').trim().toLowerCase(),
+    grupo: String(raw.grupo || ''),
+    registrado: raw.registrado || new Date().toISOString(),
+    intentos: Array.isArray(raw.intentos) ? raw.intentos : []
+  };
+}
+
+function mergeIntentos(a = [], b = []) {
+  const byKey = new Map();
+  [...a, ...b].forEach((it) => {
+    const key = [it.fecha, it.score, it.pct, it.tiempo].join('|');
+    byKey.set(key, it);
+  });
+  return [...byKey.values()].sort((x, y) => new Date(x.fecha) - new Date(y.fecha));
+}
+
+function mergeStudents(localStudents, remoteStudents) {
+  const byEmail = new Map();
+  [...localStudents, ...remoteStudents].forEach((student) => {
+    const normalized = normalizeStudent(student);
+    const key = normalized.email || normalized.id;
+    const current = byEmail.get(key);
+    if (!current) {
+      byEmail.set(key, normalized);
+      return;
+    }
+    byEmail.set(key, {
+      ...current,
+      ...normalized,
+      id: normalized.id || current.id,
+      intentos: mergeIntentos(current.intentos, normalized.intentos)
+    });
+  });
+  return [...byEmail.values()];
+}
+
+function upsertLocalStudent(student) {
+  const normalized = normalizeStudent(student);
+  const students = getStudents();
+  const idx = students.findIndex(s => s.id === normalized.id || s.email === normalized.email);
+  if (idx >= 0) students[idx] = { ...students[idx], ...normalized, intentos: mergeIntentos(students[idx].intentos, normalized.intentos) };
+  else students.push(normalized);
+  saveStudents(students);
+  return normalized;
+}
+
+async function saveStudentToFirebase(student) {
+  if (!db) return false;
+  const normalized = normalizeStudent(student);
+  if (!normalized.id || !normalized.email) return false;
+  try {
+    await db.collection(FIREBASE_COLLECTION).doc(normalized.id).set({
+      ...normalized,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+    return true;
+  } catch (err) {
+    console.error('No se pudo guardar en Firebase:', err);
+    showNotif('No se pudo guardar en Firebase; queda copia local', 'error');
+    return false;
+  }
+}
+
+async function findFirebaseStudentByEmail(email) {
+  if (!db || !email) return null;
+  try {
+    const snap = await db.collection(FIREBASE_COLLECTION)
+      .where('email', '==', email.trim().toLowerCase())
+      .limit(1)
+      .get();
+    if (snap.empty) return null;
+    const doc = snap.docs[0];
+    return normalizeStudent({ id: doc.id, ...doc.data() });
+  } catch (err) {
+    console.error('No se pudo consultar Firebase:', err);
+    showNotif('No se pudo consultar Firebase', 'error');
+    return null;
+  }
+}
+
+async function syncFromFirebase() {
+  if (!db) return getStudents();
+  try {
+    const snap = await db.collection(FIREBASE_COLLECTION).get();
+    const remote = snap.docs.map(doc => normalizeStudent({ id: doc.id, ...doc.data() }));
+    const merged = mergeStudents(getStudents(), remote);
+    saveStudents(merged);
+    await Promise.all(merged.map(student => saveStudentToFirebase(student)));
+    return merged;
+  } catch (err) {
+    console.error('No se pudo sincronizar Firebase:', err);
+    showNotif('No se pudo sincronizar Firebase; usando copia local', 'error');
+    return getStudents();
+  }
+}
+
+// ============================================================
+// REGISTRO / LOGIN
+// ============================================================
+function mostrarModalRegistro() {
+  document.getElementById('modal-registro').classList.remove('hidden');
+}
+function mostrarLoginExistente() {
+  const el = document.getElementById('login-existente');
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+async function registrarEstudiante() {
+  const nombre   = document.getElementById('reg-nombre').value.trim();
+  const apellido = document.getElementById('reg-apellido').value.trim();
+  const email    = document.getElementById('reg-email').value.trim().toLowerCase();
+  const grupo    = document.getElementById('reg-grupo').value.trim();
+  if (!nombre || !apellido || !email) { showNotif('Completa nombre, apellido y correo', 'error'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showNotif('Correo inválido', 'error'); return; }
+
+  const remoto = await findFirebaseStudentByEmail(email);
+  if (remoto) {
+    localStorage.setItem(LS_CUR, remoto.id);
+    upsertLocalStudent(remoto);
+    cerrarModal('modal-registro');
+    actualizarChipEstudiante(remoto);
+    showNotif(`¡Bienvenido de nuevo, ${remoto.nombre}! 👋`);
+    return;
+  }
+
+  const students = getStudents();
+  const existe = students.find(s => s.email === email);
+  if (existe) {
+    // ya existe → loguear directamente
+    localStorage.setItem(LS_CUR, existe.id);
+    await saveStudentToFirebase(existe);
+    cerrarModal('modal-registro');
+    actualizarChipEstudiante(existe);
+    showNotif(`¡Bienvenido de nuevo, ${existe.nombre}! 👋`);
+    return;
+  }
+
+  const id = db ? db.collection(FIREBASE_COLLECTION).doc().id : Date.now().toString();
+  const nuevo = { id, nombre, apellido, email, grupo, registrado: new Date().toISOString(), intentos: [] };
+  students.push(nuevo);
+  saveStudents(students);
+  localStorage.setItem(LS_CUR, nuevo.id);
+  await saveStudentToFirebase(nuevo);
+  cerrarModal('modal-registro');
+  actualizarChipEstudiante(nuevo);
+  showNotif(`¡Bienvenido, ${nombre}! Tu perfil fue creado 🎉`);
+}
+
+async function loginEstudiante() {
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  if (!email) { showNotif('Ingresa tu correo', 'error'); return; }
+  const students = getStudents();
+  let est = students.find(s => s.email === email);
+  if (!est) {
+    est = await findFirebaseStudentByEmail(email);
+    if (est) upsertLocalStudent(est);
+  }
+  if (!est) { showNotif('Correo no encontrado. Regístrate primero.', 'error'); return; }
+  localStorage.setItem(LS_CUR, est.id);
+  cerrarModal('modal-registro');
+  actualizarChipEstudiante(est);
+  showNotif(`¡Bienvenido, ${est.nombre}! 👋`);
+}
+
+function cerrarSesion() {
+  localStorage.removeItem(LS_CUR);
+  cerrarModal('modal-perfil');
+  document.getElementById('student-chip').style.display = 'none';
+  mostrarModalRegistro();
+}
+
+function actualizarChipEstudiante(est) {
+  const chip = document.getElementById('student-chip');
+  const avatar = document.getElementById('student-avatar');
+  const name = document.getElementById('student-chip-name');
+  chip.style.display = 'flex';
+  avatar.textContent = (est.nombre[0] + (est.apellido[0]||'')).toUpperCase();
+  name.textContent = est.nombre + ' ' + est.apellido.split(' ')[0];
+}
+
+// ============================================================
+// MODAL HELPERS
+// ============================================================
+function cerrarModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+// ============================================================
+// PERFIL MODAL
+// ============================================================
+function abrirPerfilModal() {
+  const est = getCurrentStudent();
+  if (!est) return;
+  document.getElementById('perfil-avatar-big').textContent = (est.nombre[0]+(est.apellido[0]||'')).toUpperCase();
+  document.getElementById('perfil-nombre-full').textContent = est.nombre + ' ' + est.apellido;
+  document.getElementById('perfil-email-show').textContent = est.email + (est.grupo ? ' · ' + est.grupo : '');
+  const intentos = est.intentos || [];
+  const mejor = intentos.length ? Math.max(...intentos.map(i=>i.pct)) : 0;
+  const promedio = intentos.length ? Math.round(intentos.reduce((a,i)=>a+i.pct,0)/intentos.length) : 0;
+  document.getElementById('perfil-stats').innerHTML = `
+    <div class="stat-box"><div class="val">${intentos.length}</div><div class="lbl">Intentos quiz</div></div>
+    <div class="stat-box"><div class="val">${mejor}%</div><div class="lbl">Mejor puntaje</div></div>
+    <div class="stat-box"><div class="val">${promedio}%</div><div class="lbl">Promedio</div></div>
+  `;
+  if (intentos.length) {
+    document.getElementById('perfil-intentos-list').innerHTML = `
+      <p style="font-size:.8rem;font-weight:700;color:var(--azul);margin-bottom:10px;">Historial de intentos</p>
+      <div style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;">
+        ${intentos.slice().reverse().map((it,i) => `
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--gris-cl);border-radius:8px;font-size:.8rem;">
+            <span>Intento #${intentos.length-i} · ${new Date(it.fecha).toLocaleDateString('es-CO')}</span>
+            <span class="score-pill ${scorePillClass(it.pct)}">${it.score}/15 · ${it.pct}%</span>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  } else {
+    document.getElementById('perfil-intentos-list').innerHTML = '<p style="text-align:center;color:#718096;font-size:.83rem;">Aún no has completado el quiz.</p>';
+  }
+  document.getElementById('modal-perfil').classList.remove('hidden');
+}
+
+// ============================================================
+// ADMIN MODAL & PANEL
+// ============================================================
+function abrirAdminModal() {
+  document.getElementById('admin-pass-input').value = '';
+  document.getElementById('admin-pass-error').style.display = 'none';
+  document.getElementById('modal-admin-pass').classList.remove('hidden');
+  setTimeout(() => document.getElementById('admin-pass-input').focus(), 100);
+}
+
+async function verificarAdminPass() {
+  const val = document.getElementById('admin-pass-input').value;
+  if (val === ADMIN_PASS) {
+    cerrarModal('modal-admin-pass');
+    document.getElementById('tab-admin').style.display = 'flex';
+    showScreen('admin', document.getElementById('tab-admin'));
+    await syncFromFirebase();
+    renderAdminPanel();
+    showNotif('Acceso de administrador concedido 🔐');
+  } else {
+    document.getElementById('admin-pass-error').style.display = 'block';
+    document.getElementById('admin-pass-input').value = '';
+    document.getElementById('admin-pass-input').focus();
+  }
+}
+
+// ============================================================
+// GUARDAR INTENTO DE QUIZ EN CACHE LOCAL + FIRESTORE
+// ============================================================
+function guardarIntentoQuiz(score, pct, puntos, tiempoSeg) {
+  const id = getCurrentId();
+  if (!id) return;
+  const students = getStudents();
+  const idx = students.findIndex(s => s.id === id);
+  if (idx < 0) return;
+  students[idx].intentos.push({ fecha: new Date().toISOString(), score, pct, puntos, tiempo: tiempoSeg });
+  saveStudents(students);
+  saveStudentToFirebase(students[idx]);
+}
+
+// ============================================================
+// RENDER ADMIN PANEL
+// ============================================================
+function scorePillClass(pct) {
+  if (pct >= 80) return 'score-a';
+  if (pct >= 60) return 'score-b';
+  if (pct >= 40) return 'score-c';
+  return 'score-d';
+}
+function scoreLetra(pct) {
+  if (pct >= 80) return 'A';
+  if (pct >= 60) return 'B';
+  if (pct >= 40) return 'C';
+  return 'D';
+}
+
+function renderAdminPanel(filtro, filtroScore) {
+  let students = getStudents();
+
+  // Banner stats
+  const total = students.length;
+  const conIntentos = students.filter(s => s.intentos.length > 0).length;
+  const allPcts = students.flatMap(s => s.intentos.map(i => i.pct));
+  const promGlobal = allPcts.length ? Math.round(allPcts.reduce((a,b)=>a+b,0)/allPcts.length) : 0;
+  const totalIntentos = students.reduce((a,s)=>a+s.intentos.length, 0);
+  document.getElementById('admin-stats-banner').innerHTML = `
+    <div class="admin-stat"><div class="v">${total}</div><div class="l">Estudiantes registrados</div></div>
+    <div class="admin-stat"><div class="v">${conIntentos}</div><div class="l">Con quiz completado</div></div>
+    <div class="admin-stat"><div class="v">${totalIntentos}</div><div class="l">Intentos totales</div></div>
+    <div class="admin-stat"><div class="v">${promGlobal}%</div><div class="l">Promedio global</div></div>
+    <div class="admin-stat"><div class="v">${students.filter(s=>{const m=s.intentos.length?Math.max(...s.intentos.map(i=>i.pct)):0;return m>=80;}).length}</div><div class="l">Excelente (≥80%)</div></div>
+  `;
+
+  // Filtros
+  if (filtro) students = students.filter(s =>
+    (s.nombre+' '+s.apellido+' '+s.email+' '+(s.grupo||'')).toLowerCase().includes(filtro.toLowerCase())
+  );
+  if (filtroScore) {
+    students = students.filter(s => {
+      const mejor = s.intentos.length ? Math.max(...s.intentos.map(i=>i.pct)) : -1;
+      if (filtroScore==='a') return mejor >= 80;
+      if (filtroScore==='b') return mejor>=60 && mejor<80;
+      if (filtroScore==='c') return mejor>=40 && mejor<60;
+      if (filtroScore==='d') return mejor>=0 && mejor<40;
+      if (filtroScore==='sin') return s.intentos.length === 0;
+      return true;
+    });
+  }
+
+  if (!students.length) {
+    document.getElementById('admin-tabla-wrap').innerHTML = `<div class="empty-state"><div class="ico">🔍</div><p>No hay resultados para esta búsqueda.</p></div>`;
+    return;
+  }
+
+  const rows = students.map(s => {
+    const intentos = s.intentos || [];
+    const mejor = intentos.length ? Math.max(...intentos.map(i=>i.pct)) : null;
+    const promEst = intentos.length ? Math.round(intentos.reduce((a,i)=>a+i.pct,0)/intentos.length) : null;
+    const ultimo = intentos.length ? intentos[intentos.length-1] : null;
+    const initials = (s.nombre[0]+(s.apellido[0]||'')).toUpperCase();
+    return `
+      <tr>
+        <td>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--azul);color:#fff;display:grid;place-items:center;font-size:.72rem;font-weight:800;flex-shrink:0;">${initials}</div>
+            <div>
+              <div style="font-weight:700;font-size:.85rem;">${s.nombre} ${s.apellido}</div>
+              <div style="font-size:.72rem;color:#718096;">${s.email}</div>
+            </div>
+          </div>
+        </td>
+        <td style="font-size:.8rem;color:#718096;">${s.grupo || '—'}</td>
+        <td style="text-align:center;font-weight:700;">${intentos.length}</td>
+        <td style="text-align:center;">
+          ${mejor !== null ? `<span class="score-pill ${scorePillClass(mejor)}">${mejor}% · ${scoreLetra(mejor)}</span>` : '<span style="color:#718096;font-size:.8rem;">Sin intentos</span>'}
+        </td>
+        <td style="text-align:center;">
+          ${promEst !== null ? `<span style="font-weight:600;font-size:.85rem;">${promEst}%</span>` : '—'}
+        </td>
+        <td style="font-size:.78rem;color:#718096;">
+          ${ultimo ? new Date(ultimo.fecha).toLocaleDateString('es-CO',{day:'2-digit',month:'short',year:'numeric'}) : '—'}
+        </td>
+        <td>
+          ${intentos.length ? `
+            <button class="expand-btn" onclick="toggleIntentos('det-${s.id}')">Ver intentos ▾</button>
+            <div class="attempts-detail" id="det-${s.id}">
+              <table style="width:100%;font-size:.75rem;border-collapse:collapse;">
+                <thead><tr style="color:#718096;border-bottom:1px solid var(--gris);">
+                  <th style="padding:4px 8px;text-align:left;">#</th>
+                  <th style="padding:4px 8px;text-align:left;">Fecha</th>
+                  <th style="padding:4px 8px;text-align:center;">Puntaje</th>
+                  <th style="padding:4px 8px;text-align:center;">Nota</th>
+                  <th style="padding:4px 8px;text-align:center;">Tiempo</th>
+                </tr></thead>
+                <tbody>
+                  ${intentos.map((it,i) => `
+                    <tr style="border-bottom:1px solid var(--gris);">
+                      <td style="padding:5px 8px;">${i+1}</td>
+                      <td style="padding:5px 8px;">${new Date(it.fecha).toLocaleDateString('es-CO')}</td>
+                      <td style="padding:5px 8px;text-align:center;">${it.score}/15 (${it.pct}%)</td>
+                      <td style="padding:5px 8px;text-align:center;"><span class="score-pill ${scorePillClass(it.pct)}">${scoreLetra(it.pct)}</span></td>
+                      <td style="padding:5px 8px;text-align:center;">${it.tiempo ? Math.floor(it.tiempo/60)+'m '+Math.round(it.tiempo%60)+'s' : '—'}</td>
+                    </tr>
+                  `).join('')}
+                </tbody>
+              </table>
+            </div>
+          ` : '<span style="color:#718096;font-size:.78rem;">—</span>'}
+        </td>
+      </tr>
+    `;
+  }).join('');
+
+  document.getElementById('admin-tabla-wrap').innerHTML = `
+    <div class="admin-table-wrap">
+      <table class="admin-table">
+        <thead><tr>
+          <th>Estudiante</th>
+          <th>Grupo</th>
+          <th style="text-align:center;">Intentos</th>
+          <th style="text-align:center;">Mejor nota</th>
+          <th style="text-align:center;">Promedio</th>
+          <th>Último intento</th>
+          <th>Detalle</th>
+        </tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function toggleIntentos(id) {
+  const el = document.getElementById(id);
+  el.classList.toggle('open');
+}
+
+function filtrarEstudiantes() {
+  const q = document.getElementById('admin-search').value;
+  const sc = document.getElementById('admin-filter-score').value;
+  renderAdminPanel(q, sc);
+}
+
+// ============================================================
+// EXPORTAR CSV
+// ============================================================
+async function exportarCSV() {
+  await syncFromFirebase();
+  const students = getStudents();
+  if (!students.length) { showNotif('No hay datos para exportar', 'error'); return; }
+  const header = ['Nombre','Apellido','Correo','Grupo','Registrado','Intentos','Mejor%','Promedio%','UltimaFecha'];
+  const rows = students.map(s => {
+    const its = s.intentos || [];
+    const mejor = its.length ? Math.max(...its.map(i=>i.pct)) : '';
+    const prom = its.length ? Math.round(its.reduce((a,i)=>a+i.pct,0)/its.length) : '';
+    const ult = its.length ? new Date(its[its.length-1].fecha).toLocaleDateString('es-CO') : '';
+    return [s.nombre, s.apellido, s.email, s.grupo||'', new Date(s.registrado).toLocaleDateString('es-CO'), its.length, mejor, prom, ult].map(v=>`"${v}"`).join(',');
+  });
+  const csv = [header.join(','), ...rows].join('\n');
+  const blob = new Blob(['﻿'+csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `finanzapro_calificaciones_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+  showNotif('CSV exportado exitosamente 📥');
+}
+
+// ============================================================
+// LIMPIAR DATOS ADMIN
+// ============================================================
+async function confirmarLimpiarDatos() {
+  if (confirm('¿Eliminar TODOS los datos de estudiantes? Esta acción no se puede deshacer.')) {
+    if (db) {
+      try {
+        const snap = await db.collection(FIREBASE_COLLECTION).get();
+        const batch = db.batch();
+        snap.docs.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
+      } catch (err) {
+        console.error('No se pudo limpiar Firebase:', err);
+        showNotif('No se pudo limpiar Firebase; revisa permisos', 'error');
+        return;
+      }
+    }
+    localStorage.removeItem(LS_KEY);
+    localStorage.removeItem(LS_CUR);
+    renderAdminPanel();
+    showNotif('Datos eliminados correctamente');
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+document.addEventListener('DOMContentLoaded', async () => {
+  initFirebase();
+  await syncFromFirebase();
+  updateDashStats();
+  actualizarSimulador();
+  // Verificar si hay estudiante activo
+  const est = getCurrentStudent();
+  if (est) {
+    actualizarChipEstudiante(est);
+  } else {
+    mostrarModalRegistro();
+  }
+});
+</script>
+</body>
+</html>
